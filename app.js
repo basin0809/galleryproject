@@ -10,9 +10,13 @@ var path = require('path'),
 var server = http.createServer(app)
 
 
-var configDB = require('./config/database.js');
-
-mongoose.connect(configDB.url); 
+//var configDB = require('./config/database.js');
+var mongoConnection = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
+    process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
+    process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
+    process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
+    process.env.OPENSHIFT_APP_NAME;
+mongoose.connect(mongoConnection);
 
 require('./config/passport')(passport); 
 
@@ -35,8 +39,8 @@ app.configure(function() {
 require('./app/routes.js')(app, passport,server); 
 var ipaddress = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
 var port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
-app.listen(port, ipaddress);
-//server.listen(port);
+//app.listen(port, ipaddress);
+server.listen(port,ipaddress);
 console.log('Listening  to  port ' + port);
 
 
