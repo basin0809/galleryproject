@@ -17,7 +17,7 @@ var mongoConnection = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
     process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
     process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
     process.env.OPENSHIFT_APP_NAME;
-mongoose.connect(localConnection);
+mongoose.connect(mongoConnection);
 
 require('./config/passport')(passport); 
 
@@ -41,8 +41,8 @@ require('./app/routes.js')(app, passport,server);
 var ipaddress = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
 var port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
 
-//server.listen(port, ipaddress);
-server.listen(port);
+server.listen(port, ipaddress);
+//server.listen(port);
 console.log('Listening  to  port ' + port);
 
 
