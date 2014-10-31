@@ -59,7 +59,8 @@ module.exports = function(app, passport,server) {
 		});
 
 
-		app.post('/edit',  function (req, res){
+		app.post('/edit', function (req, res) {
+		         console.log('update user:' + req.user);
 				 var tempPath = req.files.file.path,
         			targetPath = path.resolve('./uploads/'+req.files.file.originalFilename);
     				if (path.extname(req.files.file.name).toLowerCase() === '.png') {
