@@ -61,14 +61,14 @@ module.exports = function(app, passport,server) {
 
 		app.post('/edit', function (req, res) {
 		         console.log('update user:' + req.user);
-				 var tempPath = req.files.file.path,
+				 /*var tempPath = req.files.file.path,
         			targetPath = path.resolve('./uploads/'+req.files.file.originalFilename);
     				if (path.extname(req.files.file.name).toLowerCase() === '.png') {
         				fs.rename(tempPath, './uploads/image_'+req.user._id, function(err) {
             					if (err) throw err;
             				console.log("Upload completed!");
         				});
-    				}
+    				}*/
  			 User.findOne({ 'user.email' :  req.body.email }, function(err, user) {
                 		if (err){ return done(err);}
                 		if (user)
