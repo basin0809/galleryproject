@@ -17,7 +17,7 @@ var mongoConnection = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
     process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
     process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
     process.env.OPENSHIFT_APP_NAME;
-mongoose.connect(mongoConnection);
+mongoose.connect(localConnection);
 
 require('./config/passport')(passport); 
 

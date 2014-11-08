@@ -13,14 +13,13 @@
 
 <script type="text/javascript" src="/js/jquery.js"></script>
 <script type="text/javascript" src="/js/menu.js"></script>
-    <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-    <script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
-    var socket = io.connect('http://gallerylogin-helloworldbasin.rhcloud.com/');
-
+    var socket = io.connect('http://gallerylogin-helloworldbasin.rhcloud.com');
+    //var socket = io.connect('http://localhost:8080');
   socket.on('connect', function(){
     socket.emit('adduser', "<%= user.user.name %>, <%= user.user.address %>");
   });
