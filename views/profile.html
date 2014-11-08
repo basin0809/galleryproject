@@ -30,25 +30,11 @@
 var html = '<h2>Friend List</h2> <ul><% for(var i=0; i<friends.length; i++) { %><li><a href="#">'
     $.each(data, function(key, value) {
 
-var str = "<%= friends[i] %>";
-
-if(key =='<%= friends[i] %>') {
-
-	if(html.indexOf(str) != -1){
-		html += '<img src="images/green-dot.png"  >'
-	}else{
-		html += '<img src="images/green-dot.png" ><%= friends[i] %>'
-	}	
-   }else{
-
-	if(html.indexOf(str) != -1){
-		html += ''
-	}else{
-		html += '<%= friends[i] %>'
-	}	
-
-
-}
+        if (html.indexOf(str) != -1) {
+            html += ''
+        } else {
+            html += '<%= friends[i] %>'
+        }
 
      
     });
