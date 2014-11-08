@@ -12,12 +12,12 @@ var server = http.createServer(app)
 
 //var configDB = require('./config/database.js');
 var localConnection = 'mongodb://localhost/knoldus';
-var mongoConnection = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
+var openShiftConnection = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
     process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
     process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
     process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
     process.env.OPENSHIFT_APP_NAME;
-mongoose.connect(localConnection);
+mongoose.connect(openShiftConnection);
 
 require('./config/passport')(passport); 
 
