@@ -2,7 +2,8 @@ var User       = require('../app/models/user');
 var Friend       = require('../app/models/friend');
 async = require("async");
 var path = require('path'),
-    fs = require('fs');
+    fs = require('fs'),
+    q = require('q');
 module.exports = function(app, passport,server) {
 	app.get('/', function(request, response) {
 		response.render('index.html');
@@ -63,11 +64,44 @@ module.exports = function(app, passport,server) {
 		    console.log('update user:' + req.user);
 		    console.log('update userImage:' + req.files.file.name);
 				 var tempPath = req.files.file.path,
-        			targetPath = path.resolve('./uploads/'+req.files.file.originalFilename);
-    				if (path.extname(req.files.file.name).toLowerCase() === '.png') {
-        				fs.rename(tempPath, './uploads/image_'+req.user._id, function(err) {
-            					if (err) throw err;
-            				console.log("Upload completed!");
+        			targetPath = './uploads/image_' + req.user._id;
+				 if (path.extname(req.files.file.name).toLowerCase() === '.png') {
+				     var renameDeferred = q.defer();
+				     fs.rename(tempPath, targetPath, function (err) {
+        				    if (err) {
+        				        renameDeferred.reject(err);
+        				    } else {
+        				        renameDeferred.resolve();
+        				        console.log("Upload completed!");
+        				    }
+            				
+        				});
+
+        				renameDeferred.promise.then(function () {
+        				    // rename worked
+        				    console.log("Upload completed!");
+        				}, function (err) {
+
+        				    console.warn('io.move: standard rename failed, trying stream pipe... (' + err + ')');
+
+        				    // rename didn't work, try pumping
+        				    var is = fs.createReadStream(tempPath),
+                                os = fs.createWriteStream(targetPath);
+
+        				    is.pipe(os);
+
+        				    is.on('end', function () {
+        				        fs.unlinkSync(tempPath);
+        				        
+        				    });
+
+        				    is.on('error', function (err) {
+        				        throw err;
+        				    });
+
+        				    os.on('error', function (err) {
+        				        throw err;
+        				    })
         				});
     				}
  			 User.findOne({ 'user.email' :  req.body.email }, function(err, user) {
