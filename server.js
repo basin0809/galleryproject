@@ -12,6 +12,11 @@ var SampleApp = function() {
     //  Scope.
     var self = this;
 
+    var name1 = "apple";
+
+    var name2 = "orange";
+    this.name2 = name2;
+
 
     /*  ================================================================  */
     /*  Helper functions.                                                 */

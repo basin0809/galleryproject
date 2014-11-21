@@ -19,6 +19,7 @@ var openShiftConnection = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
     process.env.OPENSHIFT_APP_NAME;
 mongoose.connect(openShiftConnection);
 
+
 require('./config/passport')(passport); 
 
 app.configure(function() {
