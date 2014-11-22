@@ -1,10 +1,30 @@
-var User       = require('../app/models/user');
+var mongoose = require('mongoose');
+var User = require('../app/models/user');
+var Painting = require('../app/models/painting');
 var Friend       = require('../app/models/friend');
 async = require("async");
 var path = require('path'),
     fs = require('fs'),
     q = require('q');
-module.exports = function(app, passport,server) {
+//var configDB = require('./config/database.js');
+var localConnection = 'mongodb://localhost/knoldus';
+var openShiftConnection = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
+    process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
+    process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
+    process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
+    process.env.OPENSHIFT_APP_NAME;
+mongoose.connect(localConnection);
+module.exports = function (app, passport, server) {
+    var conn = mongoose.connection;
+    var paintings = mongoose.model('Paintings',
+               new mongoose.Schema(
+                        {
+                            author: String,
+                            paintingName: String,
+                            description: String
+                        }),
+               'paintings');
+
 	app.get('/', function(request, response) {
 		response.render('index.html');
 	});
@@ -17,17 +37,47 @@ module.exports = function(app, passport,server) {
 
 	app.get('/image.png', function (req, res) {
     		res.sendfile(path.resolve('./uploads/image_'+req.user._id));
-	}); 
+	});
 
+	app.get('/paintings/:id/image.png', function (req, res) {
+	    console.log("author:" + req.user.user.name);
+	    res.sendfile(path.resolve('./uploads/' + req.user.user.name+ '/'+req.params.id));
+
+	});
 
 	app.get('/edit', auth, function(request, response) {
 		response.render('edit.html', {
 			user : request.user
 		});
 	});
+	app.get('/upload', auth, function (request, response) {
+	    response.render('upload.html', {
+	        user: request.user
+	    });
+	});
+	app.get('/recentwork', auth, function (request, response) {
+	    console.log("recentwork:" + request.user.user.name);
+	    paintings.find(
+            { 'author': request.user.user.name },
+            function (error, results) {
+	        if (error) {
+	            response.json(error, 400);
+	        } else if (!results) {
+	            response.send(404);
+	        } else {
+	            var i = 0, stop = results.length;
+
+	            for (i; i < stop; i++) {
+	                results[i].image = undefined;
+	            }
+	            response.json(results);
+	        }
+	    });
+	});
 	app.get('/about', auth, function(request, response) {
 		response.render('about.html', {
-			user : request.user
+		    user: request.user
+
 		});
 	});
 	app.get('/logout', function(request, response) {
@@ -59,7 +109,80 @@ module.exports = function(app, passport,server) {
 			response.render('edit.html', { message: request.flash('updateerror') });
 		});
 
+		app.get('/upload', function (request, response) {
+		    response.render('upload.html', { message: request.flash('updateerror') });
+		});
+		app.post('/upload', function (req, res) {
 
+		    if (!req.files.file.name) {
+		        res.json("image cannot be empty when saving a new picture", 400);
+		        return;
+		    }
+
+		    console.log('author:' + req.param('author'));
+		    console.log('upload image:' + req.files.file.name);
+
+		    var tempPath = req.files.file.path,
+		        targetPath = './uploads/' + req.param('author');
+
+		    if (!fs.existsSync(targetPath)) {
+		        fs.mkdirSync(targetPath);
+		    }
+		    targetPath = targetPath + '/image_' + req.param('paintingName');
+		    if (req.files.file) {
+		        var renameDeferred = q.defer();
+		        fs.rename(tempPath, targetPath, function (err) {
+		            if (err) {
+		                renameDeferred.reject(err);
+		            } else {
+		                renameDeferred.resolve();
+		                console.log("Upload completed!");
+		            }
+
+		        });
+
+		        renameDeferred.promise.then(function () {
+		            // rename worked
+		            console.log("Upload completed!");
+		        }, function (err) {
+
+		            console.warn('io.move: standard rename failed, trying stream pipe... (' + err + ')');
+
+		            // rename didn't work, try pumping
+		            var is = fs.createReadStream(tempPath),
+                        os = fs.createWriteStream(targetPath);
+
+		            is.pipe(os);
+
+		            is.on('end', function () {
+		                fs.unlinkSync(tempPath);
+
+		            });
+
+		            is.on('error', function (err) {
+		                throw err;
+		            });
+
+		            os.on('error', function (err) {
+		                throw err;
+		            })
+		        });
+		    }
+		   
+		    var newPainting = {
+		        author: req.param('author'),
+		        paintingName: req.param('paintingName'),
+		        description: req.param('description'),
+		       
+		    };
+		    conn.collection('paintings').insert(newPainting, function (err, data) {
+		        
+		        console.log(data);
+		        console.log('image_' + data.paintingName);
+		        res.send("Upload completed!");
+		       // res.redirect('/paintings/' + 'image_' + req.param('paintingName'));
+		    });
+		});
 		app.post('/edit', function (req, res) {
 		    console.log('update user:' + req.user);
 		    console.log('update userImage:' + req.files.file.name);

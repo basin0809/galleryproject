@@ -1,7 +1,7 @@
 var express  = require('express');
 var app      = express();
 var port     = process.env.OPENSHIFT_NODEJS_PORT;
-var mongoose = require('mongoose');
+var bodyParser = require('body-parser');
 var passport = require('passport');
 var flash    = require('connect-flash');
 var path = require('path'),
@@ -9,23 +9,14 @@ var path = require('path'),
  var http = require('http')
 var server = http.createServer(app)
 
-
-//var configDB = require('./config/database.js');
-var localConnection = 'mongodb://localhost/knoldus';
-var openShiftConnection = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
-    process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
-    process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
-    process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
-    process.env.OPENSHIFT_APP_NAME;
-mongoose.connect(openShiftConnection);
-
-
 require('./config/passport')(passport); 
 
 app.configure(function() {
 
 	app.use(express.cookieParser());
-	app.use(express.bodyParser()); 
+	app.use(express.bodyParser());
+	app.use(bodyParser.json()); // for parsing application/json
+	app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 	app.use(express.static(path.join(__dirname, 'public')));
 	app.set('views', __dirname + '/views');
 	app.engine('html', require('ejs').renderFile);
