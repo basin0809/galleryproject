@@ -1,0 +1,42 @@
+<% include header.html %>
+<div ng-app class="box profile">
+    <fieldset class="">
+        <div class="row" ng-controller="classController">
+            <!--<img src="/paintings/<%= name %>/image.png" name="userimage" id="userimage" />-->
+            <br>
+            <br>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Author</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Painting</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="p in paintings">
+                        <td>{{p.author}}</td>
+                        <td>{{p.paintingName}}</td>
+                        <td>{{p.description}}</td>
+                        <td>
+                            <img src=/paintings/{{p.paintingName}}/image.png name="userimage" id="userimage" />
+                        
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+</div>
+
+<script>
+        function classController($scope, $http) {
+
+            $http.get("http://localhost:8080/recentwork").success(function (paintings) {
+                console.log(paintings);
+                $scope.paintings = paintings;
+            });
+        }
+</script>
+

@@ -24,6 +24,7 @@ module.exports = function (app, passport, server) {
                             description: String
                         }),
                'paintings');
+    var paintingName = undefined;
 
 	app.get('/', function(request, response) {
 		response.render('index.html');
@@ -34,6 +35,13 @@ module.exports = function (app, passport, server) {
 		});
 	});
 
+	app.get('/paintings', auth, function (request, response) {
+	    console.log("/paintings/name:" + paintingName);
+	    response.render('paintings.html', {
+	        user : request.user,
+	        name: paintingName
+	    });
+	});
 
 	app.get('/image.png', function (req, res) {
     		res.sendfile(path.resolve('./uploads/image_'+req.user._id));
@@ -41,7 +49,7 @@ module.exports = function (app, passport, server) {
 
 	app.get('/paintings/:id/image.png', function (req, res) {
 	    console.log("author:" + req.user.user.name);
-	    res.sendfile(path.resolve('./uploads/' + req.user.user.name+ '/'+req.params.id));
+	    res.sendfile(path.resolve('./uploads/' + req.user.user.name + '/image_' + req.params.id));
 
 	});
 
@@ -55,6 +63,11 @@ module.exports = function (app, passport, server) {
 	        user: request.user
 	    });
 	});
+	app.get('/paintings', auth, function (request, response) {
+	    response.render('paintings.html', {
+	        user: request.user
+	    });
+	});
 	app.get('/recentwork', auth, function (request, response) {
 	    console.log("recentwork:" + request.user.user.name);
 	    paintings.find(
@@ -65,11 +78,15 @@ module.exports = function (app, passport, server) {
 	        } else if (!results) {
 	            response.send(404);
 	        } else {
-	            var i = 0, stop = results.length;
+	            /*var i = 0, stop = results.length;
 
 	            for (i; i < stop; i++) {
 	                results[i].image = undefined;
-	            }
+	            }*/
+	           /* response.render('paintings.html', {
+	                user: request.user,
+	                name: paintingName
+	            });*/
 	            response.json(results);
 	        }
 	    });
@@ -178,9 +195,11 @@ module.exports = function (app, passport, server) {
 		    conn.collection('paintings').insert(newPainting, function (err, data) {
 		        
 		        console.log(data);
-		        console.log('image_' + data.paintingName);
-		        res.send("Upload completed!");
-		       // res.redirect('/paintings/' + 'image_' + req.param('paintingName'));
+		        //console.log('image_' + data.paintingName);
+		        //res.send("Upload completed!");
+		        //res.redirect('/paintings/' + 'image_' + req.param('paintingName'));
+		        paintingName = req.param('paintingName');
+		        res.redirect('/paintings');
 		    });
 		});
 		app.post('/edit', function (req, res) {
