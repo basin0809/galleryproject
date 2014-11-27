@@ -33,7 +33,7 @@
 <script>
         function classController($scope, $http) {
 
-            $http.get("http://localhost:8080/recentwork").success(function (paintings) {
+            $http.get("http://gallerylogin-helloworldbasin.rhcloud.com/recentwork").success(function (paintings) {
                 console.log(paintings);
                 $scope.paintings = paintings;
             });
