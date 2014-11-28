@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="">
+    <title>Friend's work</title>
+    <link rel="stylesheet" type="text/css" href="http://gallerylogin-helloworldbasin.rhcloud.com/css/login.css">
+    <link rel="stylesheet" type="text/css" href="http://gallerylogin-helloworldbasin.rhcloud.com/css/reset.css">
+    <!--<link rel="stylesheet" type="text/css" href="css/structure.css">-->
+
+
+    <link rel="stylesheet"
+          href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css" />
+
+    <script type="text/javascript" src="http://gallerylogin-helloworldbasin.rhcloud.com/js/jquery.js"></script>
+    <script type="text/javascript" src="http://gallerylogin-helloworldbasin.rhcloud.com/js/menu.js"></script>
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script type="text/javascript" src="http://gallerylogin-helloworldbasin.rhcloud.com/js/angular.min.js"></script>
+
+</head>
+<body>
+    <h1 class="title">Gallery Demo</h1>
+    <div id="content">
+
+        <div class="topContent">
+            <fieldset class="">
+                <br>
+                <h1>Welcome  <%= user.user.username %></h1>
+            </fieldset>
+        </div>
+        <div id="menu">
+            <fieldset class="">
+                <ul class="menu">
+                    <li>
+                        <a href="/about">
+                            <h1>Home</h1>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/user">
+                            <h1>Profile</h1>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/profile">
+                            <h1>Friends</h1>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/upload">
+                            <h1>Upload Paintings</h1>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/paintings">
+                            <h1>Recent Works</h1>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/logout">
+                            <h1>Log Out</h1>
+                        </a>
+                    </li>
+                </ul>
+            </fieldset>
+        </div>
+        <hr />
+    </div>
+    <div ng-app class="box profile">
+        <fieldset class="">
+            <div class="row" ng-controller="classController">
+                <!--<img src="/paintings/<%= name %>/image.png" name="userimage" id="userimage" />-->
+                <br>
+                <br>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Author</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Painting</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="p in paintings">
+                            <td>{{p.author}}</td>
+                            <td>{{p.paintingName}}</td>
+                            <td>{{p.description}}</td>
+                            <td>
+                                <img src="/paintings/<%= name %>/{{p.paintingName}}/image.png" name="userimage" id="userimage" />
+
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </fieldset>
+    </div>
+
+    <script>
+        function classController($scope, $http) {
+            var openshiftUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/<%= name %>";
+            var loaclUrl = "http://localhost:8080/recentwork/<%= name %>"
+
+            $http.get(openshiftUrl).success(function (paintings) {
+                console.log(paintings);
+                $scope.paintings = paintings;
+            });
+        }
+    </script>
+</body>
+</html>
+

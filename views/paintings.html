@@ -32,8 +32,9 @@
 
 <script>
         function classController($scope, $http) {
-
-            $http.get("http://gallerylogin-helloworldbasin.rhcloud.com/recentwork").success(function (paintings) {
+            var openshiftUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork";
+            var loaclUrl = "http://localhost:8080/recentwork"
+            $http.get(openshiftUrl).success(function (paintings) {
                 console.log(paintings);
                 $scope.paintings = paintings;
             });

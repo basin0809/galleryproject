@@ -52,7 +52,42 @@ module.exports = function (app, passport, server) {
 	    res.sendfile(path.resolve('./uploads/' + req.user.user.name + '/image_' + req.params.id));
 
 	});
+	app.get('/:id/profile', auth, function (req, res) {
+	    console.log("/:id/profile/author:" + req.params.id);
+	    res.render('friendpaintings.html', {
+	        user: req.user,
+	        name: req.params.id
+	    });
+	   
+	});
+	app.get('/paintings/:name/:id/image.png', function (req, res) {
+	    console.log("/paintings/:name/:id/image.png/author:" + req.params.name);
+	    res.sendfile(path.resolve('./uploads/' + req.params.name + '/image_' + req.params.id));
 
+	});
+	app.get('/recentwork/:id', auth, function (request, response) {
+	    console.log("recentwork:" + request.params.id);
+	    paintings.find(
+            { 'author': request.params.id },
+            function (error, results) {
+                if (error) {
+                    response.json(error, 400);
+                } else if (!results) {
+                    response.send(404);
+                } else {
+                    /*var i = 0, stop = results.length;
+    
+                    for (i; i < stop; i++) {
+                        results[i].image = undefined;
+                    }*/
+                    /* response.render('paintings.html', {
+                         user: request.user,
+                         name: paintingName
+                     });*/
+                    response.json(results);
+                }
+            });
+	});
 	app.get('/edit', auth, function(request, response) {
 		response.render('edit.html', {
 			user : request.user
@@ -267,7 +302,7 @@ module.exports = function (app, passport, server) {
 			console.log('No Friend')
 				}else{
     					User.findById(friend.friend.anotherfriendid, function(err, user) {
-						frdDetails.push(user.user.name+', '+user.user.address);
+						frdDetails.push(user.user.name);
  						callback();
 					});
    				}

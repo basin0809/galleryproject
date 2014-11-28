@@ -27,19 +27,20 @@
 
   socket.on('updateusers', function(data) {
     $('#users').empty();
-var html = '<h2>Friend List</h2> <ul><% for(var i=0; i<friends.length; i++) { %><li><a href="#">'
+var html = '<h2>Friend List</h2> <ul><% for(var i=0; i<friends.length; i++) { %><li>'
     $.each(data, function(key, value) {
         var str = "<%= friends[i] %>";
+        console.log("friend:"+str);
         if (html.indexOf(str) != -1) {
             html += ''
         } else {
-            html += '<%= friends[i] %>'
+            html += '<a href="http://localhost:8080/<%= friends[i] %>/profile"><%= friends[i] %></a>'
         }
 
      
     });
 
-	html +=  '</a></li><% } %> </ul>'
+	html +=  '</li><% } %> </ul>'
 
 
 $('#users').append(html)
