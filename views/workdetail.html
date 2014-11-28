@@ -1,0 +1,57 @@
+<% include header.html %>
+<div ng-app class="box profile">
+    <fieldset class="">
+        <div class="row" ng-controller="classController">
+            <br>
+            <br>
+            <ul>
+                <li><span>Author: </span><%= authorName %></li>
+                <li><span>Painting:</span><%= paintingName %></li>
+                <li><%= description %></li>
+                <li><img src="/paintings/<%= authorName %>/<%= paintingName %>/image.png" id="userimage" /></li>
+            </ul>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Viwer</th>
+                        <th>Comments</th>                    
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="c in comments">
+                        <td>{{c.author}}</td>
+                        <td>{{c.comments}}</td>                 
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row">
+            <form action="/submitcomments/<%= authorName %>/<%= paintingName %>/<%= description %>" method="post" enctype="multipart/form-data">
+
+                <label>Say Something? </label>
+                <textarea rows="5" cols="100" placeholder="Enter Your Comments" name="comments"></textarea>
+
+                <footer>
+                    <input type="submit" value="Submit" tabindex="1">
+                </footer>
+            </form>
+        </div>
+    </fieldset>
+</div>
+
+<script>
+    function classController($scope, $http) {
+        var openshiftUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/comments/<%= authorName %>/<%= paintingName %>";
+        var loaclUrl = "http://localhost:8080/recentwork/comments/<%= authorName %>/<%= paintingName %>"
+        $http.get(openshiftUrl).success(function (comments) {
+            console.log(comments);
+            $scope.comments = comments;
+        });
+    }
+</script>
+
+
+
+
+

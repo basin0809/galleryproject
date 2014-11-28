@@ -24,6 +24,14 @@ module.exports = function (app, passport, server) {
                             description: String
                         }),
                'paintings');
+    var comments = mongoose.model('Comments',
+               new mongoose.Schema(
+                        {
+                            author: String,
+                            paintingName: String,
+                            comments: String
+                        }),
+               'comments');
     var paintingName = undefined;
 
 	app.get('/', function(request, response) {
@@ -65,6 +73,23 @@ module.exports = function (app, passport, server) {
 	    res.sendfile(path.resolve('./uploads/' + req.params.name + '/image_' + req.params.id));
 
 	});
+
+	app.get('/recentwork/comments/:authorName/:paintingName', auth, function (request, response) {
+	    console.log("comments:" + request.params.paintingName);
+	    comments.find(
+            { 'paintingName': request.params.paintingName },
+            function (error, results) {
+                if (error) {
+                    response.json(error, 400);
+                } else if (!results) {
+                    response.send(404);
+                } else {
+                    console.log("comments results:" + results);
+                    response.json(results);
+                }
+            });
+	});
+
 	app.get('/recentwork/:id', auth, function (request, response) {
 	    console.log("recentwork:" + request.params.id);
 	    paintings.find(
@@ -87,6 +112,14 @@ module.exports = function (app, passport, server) {
                     response.json(results);
                 }
             });
+	});
+	app.get('/recentwork/:authorName/:paintingName/:description', auth, function (request, response) {
+	    response.render('workdetail.html', {
+	        user: request.user,
+	        authorName: request.params.authorName,
+	        paintingName: request.params.paintingName,
+	        description: request.params.description
+	    });
 	});
 	app.get('/edit', auth, function(request, response) {
 		response.render('edit.html', {
@@ -164,6 +197,21 @@ module.exports = function (app, passport, server) {
 		app.get('/upload', function (request, response) {
 		    response.render('upload.html', { message: request.flash('updateerror') });
 		});
+		
+		app.post('/submitcomments/:authorName/:paintingName/:description', function (req, res) {
+		    var newComments = {
+		        author: req.user.user.name,
+		        paintingName: req.param('paintingName'),
+		        comments: req.param('comments'),
+		       
+		    };
+		    conn.collection('comments').insert(newComments, function (err, data) {
+		        
+		        console.log(data);
+		        res.redirect('/recentwork/' + req.param('authorName') + '/' + req.param('paintingName') + '/' + req.param('description'));
+		    });
+		});
+
 		app.post('/upload', function (req, res) {
 
 		    if (!req.files.file.name) {
