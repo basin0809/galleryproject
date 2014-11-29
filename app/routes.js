@@ -29,6 +29,7 @@ module.exports = function (app, passport, server) {
                         {
                             author: String,
                             paintingName: String,
+                            paintingId: String,
                             comments: String
                         }),
                'comments');
@@ -74,10 +75,10 @@ module.exports = function (app, passport, server) {
 
 	});
 
-	app.get('/recentwork/comments/:authorName/:paintingName', auth, function (request, response) {
+	app.get('/recentwork/comments/:authorName/:paintingName/:paintingId', auth, function (request, response) {
 	    console.log("comments:" + request.params.paintingName);
 	    comments.find(
-            { 'paintingName': request.params.paintingName },
+            { 'paintingId': request.params.paintingId },
             function (error, results) {
                 if (error) {
                     response.json(error, 400);
@@ -100,27 +101,31 @@ module.exports = function (app, passport, server) {
                 } else if (!results) {
                     response.send(404);
                 } else {
-                    /*var i = 0, stop = results.length;
-    
-                    for (i; i < stop; i++) {
-                        results[i].image = undefined;
-                    }*/
-                    /* response.render('paintings.html', {
-                         user: request.user,
-                         name: paintingName
-                     });*/
+                  
                     response.json(results);
                 }
             });
 	});
-	app.get('/recentwork/:authorName/:paintingName/:description', auth, function (request, response) {
+	app.get('/recentwork/:authorName/:paintingName/:id/:description', auth, function (request, response) {
 	    response.render('workdetail.html', {
 	        user: request.user,
 	        authorName: request.params.authorName,
 	        paintingName: request.params.paintingName,
+	        paintingId: request.params.id,
 	        description: request.params.description
 	    });
 	});
+
+	app.get('/paintingedit/:authorName/:paintingName/:id/:description', auth, function (request, response) {
+	    response.render('paintingedit.html', {
+	        user: request.user,
+	        authorName: request.params.authorName,
+	        paintingName: request.params.paintingName,
+	        paintingId: request.params.id,
+	        description: request.params.description
+	    });
+	});
+
 	app.get('/edit', auth, function(request, response) {
 		response.render('edit.html', {
 			user : request.user
@@ -145,16 +150,7 @@ module.exports = function (app, passport, server) {
 	            response.json(error, 400);
 	        } else if (!results) {
 	            response.send(404);
-	        } else {
-	            /*var i = 0, stop = results.length;
-
-	            for (i; i < stop; i++) {
-	                results[i].image = undefined;
-	            }*/
-	           /* response.render('paintings.html', {
-	                user: request.user,
-	                name: paintingName
-	            });*/
+	        } else {           
 	            response.json(results);
 	        }
 	    });
@@ -197,18 +193,58 @@ module.exports = function (app, passport, server) {
 		app.get('/upload', function (request, response) {
 		    response.render('upload.html', { message: request.flash('updateerror') });
 		});
-		
-		app.post('/submitcomments/:authorName/:paintingName/:description', function (req, res) {
+
+		app.delete("/delete/:authorName/:paintingName/:paintingId/:description", function (request, response) {
+		    paintings.find({ '_id': request.params.paintingId }).remove(function (err) {
+		        if (!err) {
+		            console.log("painting deleted successfully");	           
+		        }
+		        else {
+		            console.log("Error: could not delete painting ");
+		        }
+		    });
+		    comments.find({ 'paintingId': request.params.paintingId }).remove(function (err) {
+		        if (!err) {
+		            console.log("comments deleted successfully");	            
+		        }
+		        else {
+		            console.log("Error: could not delete comments");
+		        }
+		        response.json("delete done.");
+		    });
+		});
+
+		app.post('/submitdescription/:authorName/:paintingName/:paintingId/:description', function (request, response) {
+		    paintings.findOne({ '_id': request.params.paintingId }, function (err, painting)
+		    {
+		        if (err) { return done(err); }
+		        if (painting) {
+		            painting.description = request.param('newdescription');
+		            painting.save(function (err) {
+		                if (!err) {
+		                    console.log("edit successfully");
+		                    response.redirect('/paintings');
+		                }
+		                else {
+		                    console.log("Error: could not save description ");
+		                }
+		            });
+		        }
+		           
+		    });		   
+		});
+		app.post('/submitcomments/:authorName/:paintingName/:paintingId/:description', function (req, res) {
 		    var newComments = {
 		        author: req.user.user.name,
 		        paintingName: req.param('paintingName'),
+		        paintingId: req.param('paintingId'),
 		        comments: req.param('comments'),
 		       
 		    };
 		    conn.collection('comments').insert(newComments, function (err, data) {
 		        
 		        console.log(data);
-		        res.redirect('/recentwork/' + req.param('authorName') + '/' + req.param('paintingName') + '/' + req.param('description'));
+		        res.redirect('/recentwork/' + req.param('authorName') + '/' + req.param('paintingName') + '/' + req.param('paintingId')+ '/' + req.param('description'));
 		    });
 		});
 

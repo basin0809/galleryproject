@@ -27,7 +27,7 @@
         </div>
 
         <div class="row">
-            <form action="/submitcomments/<%= authorName %>/<%= paintingName %>/<%= description %>" method="post" enctype="multipart/form-data">
+            <form action="/submitcomments/<%= authorName %>/<%= paintingName %>/<%= paintingId %>/<%= description %>" method="post" enctype="multipart/form-data">
 
                 <label>Say Something? </label>
                 <textarea rows="5" cols="100" placeholder="Enter Your Comments" name="comments"></textarea>
@@ -42,8 +42,8 @@
 
 <script>
     function classController($scope, $http) {
-        var openshiftUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/comments/<%= authorName %>/<%= paintingName %>";
-        var loaclUrl = "http://localhost:8080/recentwork/comments/<%= authorName %>/<%= paintingName %>"
+        var openshiftUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/comments/<%= authorName %>/<%= paintingName %>/<%= paintingId %>";
+        var loaclUrl = "http://localhost:8080/recentwork/comments/<%= authorName %>/<%= paintingName %>/<%= paintingId %>"
         $http.get(openshiftUrl).success(function (comments) {
             console.log(comments);
             $scope.comments = comments;

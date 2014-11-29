@@ -1,13 +1,14 @@
 <% include header.html %>
-<div ng-app class="box profile">
+<div ng-app="paintings" class="box profile">
     <fieldset class="">
         <div class="row" ng-controller="classController">
-            <!--<img src="/paintings/<%= name %>/image.png" name="userimage" id="userimage" />-->
+           
             <br>
             <br>
             <table class="table">
                 <thead>
                     <tr>
+                        <th></th>
                         <th>Author</th>
                         <th>Name</th>
                         <th>Description</th>
@@ -16,17 +17,25 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="p in paintings">
+                        <td>
+                            <button ng-click="comments(p.author, p.paintingName, p._id, p.description)">Comments</button>
+                            <br/>
+                            <button ng-click="edit(p.author, p.paintingName, p._id, p.description)">Edit</button>
+                            <br/>
+                            <button ng-click="delete(p.author, p.paintingName, p._id, p.description)" ng-confirm-click="Would you like to delete {{p.paintingName }}?">Delete</button>
+                        </td>
                         <td>{{p.author}}</td>
                         <td>
-                            <a href="http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/{{p.author}}/{{p.paintingName}}/{{p.description}}">
+                            <a href="http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/{{p.author}}/{{p.paintingName}}/{{p._id}}/{{p.description}}">
                                 {{p.paintingName}}
                             </a>
                         </td>
                         <td>{{p.description}}</td>
                         <td>
                             <img src=/paintings/{{p.paintingName}}/image.png name="userimage" id="userimage" />
-                        
+
                         </td>
+                       
                     </tr>
                 </tbody>
             </table>
@@ -35,13 +44,75 @@
 </div>
 
 <script>
-        function classController($scope, $http) {
-            var openshiftUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork";
-            var loaclUrl = "http://localhost:8080/recentwork"
-            $http.get(openshiftUrl).success(function (paintings) {
-                console.log(paintings);
-                $scope.paintings = paintings;
+    var app = angular.module('paintings', []);
+
+    app.controller('classController', function ($scope, $http) {
+        var openshiftUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork";
+        var loaclUrl = "http://localhost:8080/recentwork"
+        $http.get(openshiftUrl).success(function (paintings) {
+            console.log(paintings);
+            $scope.paintings = paintings;
+        });
+        
+        $scope.delete = function (author, name, id, desp) {          
+            var URL = "http://gallerylogin-helloworldbasin.rhcloud.com/delete/AUTHOR/PNAME/PID/DESP";
+            var url = URL.replace("AUTHOR", author);
+            url = url.replace("PNAME", name);
+            url = url.replace("PID", id);
+            url = url.replace("DESP", desp);
+            $http.delete(url).success(function (response) {
+                alert('Delete successfully.');
+                $scope.all();
             });
         }
-</script>
+        $scope.comments = function (author, name, id, desp) {
+            console.log(name);
+            var URL = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/AUTHOR/PNAME/PID/DESP";
+            var url = URL.replace("AUTHOR", author);
+            url = url.replace("PNAME", name);
+            url = url.replace("PID", id);
+            url = url.replace("DESP", desp);
+            console.log(url);
+            location.href = url;
+        }
+        $scope.edit = function (author, name, id, desp) {
+            var URL = "http://gallerylogin-helloworldbasin.rhcloud.com/paintingedit/AUTHOR/PNAME/PID/DESP";
+            var url = URL.replace("AUTHOR", author);
+            url = url.replace("PNAME", name);
+            url = url.replace("PID", id);
+            url = url.replace("DESP", desp);
+            console.log(url);
+            location.href = url;
+        }
 
+        $scope.all = function () {
+            $http.get(openshiftUrl)
+           .success($scope.renderpaintings);
+        };
+
+        $scope.renderpaintings = function (paintings) {
+            console.log("refresh");
+            console.log(paintings);
+            $scope.paintings = paintings;
+        };
+
+        $scope.all();
+    });
+
+    app.directive('ngConfirmClick', [
+            function () {
+                return {
+                    priority: 1,
+                    terminal: true,
+                    link: function (scope, element, attr) {
+                        var msg = attr.ngConfirmClick || "Are you sure?";
+                        var clickAction = attr.ngClick;
+                        element.bind('click', function (event) {
+                            if (window.confirm(msg)) {
+                                scope.$eval(clickAction)
+                            }
+                        });
+                    }
+                };
+            }])
+</script>
