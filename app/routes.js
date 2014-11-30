@@ -194,7 +194,7 @@ module.exports = function (app, passport, server) {
 		    response.render('upload.html', { message: request.flash('updateerror') });
 		});
 
-		app.delete("/delete/:authorName/:paintingName/:paintingId/:description", function (request, response) {
+		app.delete("/delete/:authorName/:paintingName/:paintingId", function (request, response) {
 		    paintings.find({ '_id': request.params.paintingId }).remove(function (err) {
 		        if (!err) {
 		            console.log("painting deleted successfully");	           
@@ -215,6 +215,10 @@ module.exports = function (app, passport, server) {
 		});
 
 		app.post('/submitdescription/:authorName/:paintingName/:paintingId/:description', function (request, response) {
+		    if (!request.param('description')) {
+		        response.json("description cannot be empty when saving a new picture", 400);
+		        return;
+		    }
 		    paintings.findOne({ '_id': request.params.paintingId }, function (err, painting)
 		    {
 		        if (err) { return done(err); }
@@ -252,6 +256,10 @@ module.exports = function (app, passport, server) {
 
 		    if (!req.files.file.name) {
 		        res.json("image cannot be empty when saving a new picture", 400);
+		        return;
+		    }
+		    if (!req.param('description')) {
+		        res.json("description cannot be empty when saving a new picture", 400);
 		        return;
 		    }
 

@@ -16,7 +16,7 @@
             <form action="/submitdescription/<%= authorName %>/<%= paintingName %>/<%= paintingId %>/<%= description %>" method="post" enctype="multipart/form-data">
 
                 <label>Edit Description: </label>
-                <textarea rows="5" cols="100" placeholder="<%= description %>" name="newdescription"></textarea>
+                <textarea rows="5" cols="100" placeholder="<%= description %>" name="newdescription" required></textarea>
 
                 <footer>
                     <input type="submit" value="Submit" tabindex="1">
