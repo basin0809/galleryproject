@@ -82,7 +82,7 @@
         $scope.edit = function (authorId, author, name, id, desp) {
             var URL = "http://gallerylogin-helloworldbasin.rhcloud.com/paintingedit/AID/AUTHOR/PNAME/PID/DESP";
             var url = URL.replace("AID", authorId);
-            url = URL.replace("AUTHOR", author);
+            url = url.replace("AUTHOR", author);
             url = url.replace("PNAME", name);
             url = url.replace("PID", id);
             url = url.replace("DESP", desp);
