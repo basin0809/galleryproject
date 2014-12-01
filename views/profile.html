@@ -19,7 +19,7 @@
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
-    var socket = io.connect('http://gallerylogin-helloworldbasin.rhcloud.com');
+   var socket = io.connect('http://gallerylogin-helloworldbasin.rhcloud.com');
     //var socket = io.connect('http://localhost:8080');
   socket.on('connect', function(){
     socket.emit('adduser', "<%= user.user.name %>, <%= user.user.address %>");
@@ -34,7 +34,7 @@ var html = '<h2>Friend List</h2> <ul><% for(var i=0; i<friends.length; i++) { %>
         if (html.indexOf(str) != -1) {
             html += ''
         } else {
-            html += '<a href="http://gallerylogin-helloworldbasin.rhcloud.com/<%= friends[i] %>/profile"><%= friends[i] %></a>'
+            html += '<a href="http://gallerylogin-helloworldbasin.rhcloud.com/<%= friendsId[i] %>/<%= friends[i] %>/profile"><%= friends[i] %></a>'
         }
 
      

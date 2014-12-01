@@ -12,19 +12,23 @@
                         <th>Name</th>
                         <th>Description</th>
                         <th>Painting</th>
+                        <th>Rating</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr ng-repeat="p in paintings">
                         <td>
-                            <button ng-click="comments(p.author, p.paintingName, p._id, p.description)">Comments</button>
+                            <button ng-click="comments(p.authorId, p.author, p.paintingName, p._id, p.description)">Comments</button>
                         </td>
                         <td>{{p.author}}</td>
                         <td><a href="http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/{{p.author}}/{{p.paintingName}}/{{p._id}}/{{p.description}}">{{p.paintingName}}</a></td>
                         <td>{{p.description}}</td>
                         <td>
-                            <img src="/paintings/<%= name %>/{{p.paintingName}}/image.png" name="userimage" id="userimage" />
+                            <img src="/paintings/<%= authorId %>/{{p.paintingName}}/image.png" name="userimage" id="userimage" />
 
+                        </td>
+                        <td class="ng-binding">
+                            <span>{{p.rating}} of 5 stars</span>
                         </td>
                     </tr>
                 </tbody>
@@ -37,18 +41,19 @@
     var app = angular.module('paintings', []);
 
     app.controller('classController', function ($scope, $http) {
-        var openshiftUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/<%= name %>";
-        var loaclUrl = "http://localhost:8080/recentwork/<%= name %>"
+        var openshiftUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/<%= authorId %>";
+        var loaclUrl = "http://localhost:8080/recentwork/<%= authorId %>"
 
         $http.get(openshiftUrl).success(function (paintings) {
             console.log(paintings);
             $scope.paintings = paintings;
         });
        
-        $scope.comments = function (author, name, id, desp) {
+        $scope.comments = function (authorId, author, name, id, desp) {
             console.log(name);
-            var URL = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/AUTHOR/PNAME/PID/DESP";
-            var url = URL.replace("AUTHOR", author);
+            var URL = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/AID/AUTHOR/PNAME/PID/DESP";
+            var url = URL.replace("AID", authorId);
+            url = url.replace("AUTHOR", author);
             url = url.replace("PNAME", name);
             url = url.replace("PID", id);
             url = url.replace("DESP", desp);

@@ -13,27 +13,31 @@
                         <th>Name</th>
                         <th>Description</th>
                         <th>Painting</th>
+                        <th>Rating</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr ng-repeat="p in paintings">
                         <td>
-                            <button ng-click="comments(p.author, p.paintingName, p._id, p.description)">Comments</button>
+                            <button ng-click="comments(p.authorId, p.author, p.paintingName, p._id, p.description)">Comments</button>
                             <br/>
-                            <button ng-click="edit(p.author, p.paintingName, p._id, p.description)">Edit</button>
+                            <button ng-click="edit(p.authorId, p.author, p.paintingName, p._id, p.description)">Edit</button>
                             <br/>
                             <button ng-click="delete(p.author, p.paintingName, p._id)" ng-confirm-click="Would you like to delete {{p.paintingName }}?">Delete</button>
                         </td>
                         <td>{{p.author}}</td>
                         <td>
-                            <a href="http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/{{p.author}}/{{p.paintingName}}/{{p._id}}/{{p.description}}">
+                            <a href="http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/{{p.authorId}}/{{p.author}}/{{p.paintingName}}/{{p._id}}/{{p.description}}">
                                 {{p.paintingName}}
                             </a>
                         </td>
                         <td>{{p.description}}</td>
                         <td>
-                            <img src=/paintings/{{p.paintingName}}/image.png name="userimage" id="userimage" />
+                            <img src=/paintings/{{p.authorId}}/{{p.paintingName}}/image.png name="userimage" id="userimage" />
 
+                        </td>
+                        <td class="ng-binding">
+                            <span>{{p.rating}} of 5 stars</span>
                         </td>
                        
                     </tr>
@@ -64,19 +68,21 @@
                 $scope.all();
             });
         }
-        $scope.comments = function (author, name, id, desp) {
+        $scope.comments = function (authorId, author, name, id, desp) {
             console.log(name);
-            var URL = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/AUTHOR/PNAME/PID/DESP";
-            var url = URL.replace("AUTHOR", author);
+            var URL = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/AID/AUTHOR/PNAME/PID/DESP";
+            var url = URL.replace("AID", authorId);
+            url = url.replace("AUTHOR", author);
             url = url.replace("PNAME", name);
             url = url.replace("PID", id);
             url = url.replace("DESP", desp);
             console.log(url);
             location.href = url;
         }
-        $scope.edit = function (author, name, id, desp) {
-            var URL = "http://gallerylogin-helloworldbasin.rhcloud.com/paintingedit/AUTHOR/PNAME/PID/DESP";
-            var url = URL.replace("AUTHOR", author);
+        $scope.edit = function (authorId, author, name, id, desp) {
+            var URL = "http://gallerylogin-helloworldbasin.rhcloud.com/paintingedit/AID/AUTHOR/PNAME/PID/DESP";
+            var url = URL.replace("AID", authorId);
+            url = URL.replace("AUTHOR", author);
             url = url.replace("PNAME", name);
             url = url.replace("PID", id);
             url = url.replace("DESP", desp);
@@ -114,4 +120,5 @@
                     }
                 };
             }])
+    
 </script>

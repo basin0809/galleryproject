@@ -13,15 +13,23 @@ var openShiftConnection = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
     process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
     process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
     process.env.OPENSHIFT_APP_NAME;
+var bodyParser = require('body-parser');
+
 mongoose.connect(openShiftConnection);
 module.exports = function (app, passport, server) {
+    var Schema = mongoose.Schema,
+    ObjectId = Schema.ObjectId;
     var conn = mongoose.connection;
     var paintings = mongoose.model('Paintings',
                new mongoose.Schema(
                         {
+                            authorId: String,
                             author: String,
                             paintingName: String,
-                            description: String
+                            description: String,
+                            ratingSum: Number,
+                            ratingCount: Number,
+                            rating: Number
                         }),
                'paintings');
     var comments = mongoose.model('Comments',
@@ -34,7 +42,7 @@ module.exports = function (app, passport, server) {
                         }),
                'comments');
     var paintingName = undefined;
-
+    app.use(bodyParser.json());
 	app.get('/', function(request, response) {
 		response.render('index.html');
 	});
@@ -56,25 +64,46 @@ module.exports = function (app, passport, server) {
     		res.sendfile(path.resolve('./uploads/image_'+req.user._id));
 	});
 
-	app.get('/paintings/:id/image.png', function (req, res) {
-	    console.log("author:" + req.user.user.name);
-	    res.sendfile(path.resolve('./uploads/' + req.user.user.name + '/image_' + req.params.id));
-
-	});
-	app.get('/:id/profile', auth, function (req, res) {
+	app.get('/:authorId/:authorName/profile', auth, function (req, res) {
 	    console.log("/:id/profile/author:" + req.params.id);
 	    res.render('friendpaintings.html', {
 	        user: req.user,
-	        name: req.params.id
+	        authorId: req.params.authorId,
+	        authorName: req.params.authorName
 	    });
 	   
 	});
-	app.get('/paintings/:name/:id/image.png', function (req, res) {
-	    console.log("/paintings/:name/:id/image.png/author:" + req.params.name);
-	    res.sendfile(path.resolve('./uploads/' + req.params.name + '/image_' + req.params.id));
+	app.get('/paintings/:authorId/:paintingName/image.png', function (req, res) {
+	    console.log("/paintings/:name/:id/image.png/author:" + req.params.paintingName);
+	    res.sendfile(path.resolve('./uploads/' + req.params.authorId + '/image_' + req.params.paintingName));
 
 	});
 
+	app.post('/recentwork/rating/:authorName/:paintingName/:paintingId', function (request, response) {
+	    console.log("rating body:" + request.body.rating);
+	    response.json(request.body)
+        paintings.findOne({ '_id': request.params.paintingId }, function (err, painting)
+        {
+            if (err) { return done(err); }
+            if (painting) {
+                painting.ratingSum = painting.ratingSum + request.body.rating;
+                painting.ratingCount = painting.ratingCount + 1;
+                painting.rating = parseInt((painting.ratingSum / painting.ratingCount), 10);
+                painting.save(function (err) {
+                    if (!err) {
+                        console.log("rate successfully");
+                        console.log("rate sum: " + painting.ratingSum);
+                        console.log("rate count: " + painting.ratingCount);
+                        console.log("rate : " + painting.rating);
+                    }
+                    else {
+                        console.log("Error: could not rate ");
+                    }
+                });
+            }
+		           
+        });		 
+    });
 	app.get('/recentwork/comments/:authorName/:paintingName/:paintingId', auth, function (request, response) {
 	    console.log("comments:" + request.params.paintingName);
 	    comments.find(
@@ -94,7 +123,7 @@ module.exports = function (app, passport, server) {
 	app.get('/recentwork/:id', auth, function (request, response) {
 	    console.log("recentwork:" + request.params.id);
 	    paintings.find(
-            { 'author': request.params.id },
+            { 'authorId': request.params.id },
             function (error, results) {
                 if (error) {
                     response.json(error, 400);
@@ -106,9 +135,10 @@ module.exports = function (app, passport, server) {
                 }
             });
 	});
-	app.get('/recentwork/:authorName/:paintingName/:id/:description', auth, function (request, response) {
+	app.get('/recentwork/:authorId/:authorName/:paintingName/:id/:description', auth, function (request, response) {
 	    response.render('workdetail.html', {
 	        user: request.user,
+	        authorId: request.params.authorId,
 	        authorName: request.params.authorName,
 	        paintingName: request.params.paintingName,
 	        paintingId: request.params.id,
@@ -116,9 +146,10 @@ module.exports = function (app, passport, server) {
 	    });
 	});
 
-	app.get('/paintingedit/:authorName/:paintingName/:id/:description', auth, function (request, response) {
+	app.get('/paintingedit/:authorId/:authorName/:paintingName/:id/:description', auth, function (request, response) {
 	    response.render('paintingedit.html', {
 	        user: request.user,
+	        authorId: request.params.authorId,
 	        authorName: request.params.authorName,
 	        paintingName: request.params.paintingName,
 	        paintingId: request.params.id,
@@ -142,15 +173,16 @@ module.exports = function (app, passport, server) {
 	    });
 	});
 	app.get('/recentwork', auth, function (request, response) {
-	    console.log("recentwork:" + request.user.user.name);
+	    console.log("find recentwork:" + request.user._id);
 	    paintings.find(
-            { 'author': request.user.user.name },
+            { 'authorId': request.user._id.toString()},
             function (error, results) {
 	        if (error) {
 	            response.json(error, 400);
 	        } else if (!results) {
 	            response.send(404);
-	        } else {           
+	        } else {
+	            console.log("find recentwork:" + results);
 	            response.json(results);
 	        }
 	    });
@@ -237,7 +269,7 @@ module.exports = function (app, passport, server) {
 		           
 		    });		   
 		});
-		app.post('/submitcomments/:authorName/:paintingName/:paintingId/:description', function (req, res) {
+		app.post('/submitcomments/:authorId/:authorName/:paintingName/:paintingId/:description', function (req, res) {
 		    var newComments = {
 		        author: req.user.user.name,
 		        paintingName: req.param('paintingName'),
@@ -248,11 +280,12 @@ module.exports = function (app, passport, server) {
 		    conn.collection('comments').insert(newComments, function (err, data) {
 		        
 		        console.log(data);
-		        res.redirect('/recentwork/' + req.param('authorName') + '/' + req.param('paintingName') + '/' + req.param('paintingId')+ '/' + req.param('description'));
+		        res.redirect('/recentwork/' + req.param('authorId') + '/' + req.param('authorName') + '/' + req.param('paintingName') + '/' + req.param('paintingId') + '/' + req.param('description'));
 		    });
 		});
 
 		app.post('/upload', function (req, res) {
+		    console.log("up:" + req.user);
 
 		    if (!req.files.file.name) {
 		        res.json("image cannot be empty when saving a new picture", 400);
@@ -267,8 +300,8 @@ module.exports = function (app, passport, server) {
 		    console.log('upload image:' + req.files.file.name);
 
 		    var tempPath = req.files.file.path,
-		        targetPath = './uploads/' + req.param('author');
-
+		        //targetPath = './uploads/' + req.param('author');
+                targetPath = './uploads/' + req.user._id;
 		    if (!fs.existsSync(targetPath)) {
 		        fs.mkdirSync(targetPath);
 		    }
@@ -314,9 +347,13 @@ module.exports = function (app, passport, server) {
 		    }
 		   
 		    var newPainting = {
-		        author: req.param('author'),
+		        authorId: req.user._id.toString(),
+		        author: req.param('author'),               
 		        paintingName: req.param('paintingName'),
 		        description: req.param('description'),
+		        ratingSum: 0,
+		        ratingCount: 0,
+                rating:0
 		       
 		    };
 		    conn.collection('paintings').insert(newPainting, function (err, data) {
@@ -387,22 +424,24 @@ module.exports = function (app, passport, server) {
 
       		if (!err) {
 		var frdDetails = []
-
+		var frdIds = []
 		async.each(friends,
     			function(friend, callback){
 				if(friend.friend.anotherfriendid == ''){
 			console.log('No Friend')
 				}else{
     					User.findById(friend.friend.anotherfriendid, function(err, user) {
-						frdDetails.push(user.user.name);
- 						callback();
+    					    frdDetails.push(user.user.name);
+    					    frdIds.push(user._id.toString());
+ 						    callback();
 					});
    				}
   			},
   			function(err){
          			response.render('profile.html', {
 					user : request.user,
-					friends: frdDetails
+					friends: frdDetails,
+         			friendsId: frdIds
 				});
   			}
 		);

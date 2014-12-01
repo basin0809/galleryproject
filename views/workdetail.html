@@ -1,5 +1,5 @@
 <% include header.html %>
-<div ng-app class="box profile">
+<div ng-app="workdetail" class="box profile">
     <fieldset class="">
         <div class="row" ng-controller="classController">
             <br>
@@ -8,8 +8,13 @@
                 <li><span>Author: </span><%= authorName %></li>
                 <li><span>Painting:</span><%= paintingName %></li>
                 <li><%= description %></li>
-                <li><img src="/paintings/<%= authorName %>/<%= paintingName %>/image.png" id="userimage" /></li>
+                <li><img src="/paintings/<%= authorId %>/<%= paintingName %>/image.png" id="userimage" /></li>
             </ul>
+            <h3>Rating</h3>
+            <div ng-init="rating = star.rating + 1"></div>
+
+            <div class="star-rating" star-rating rating-value="rating"
+                 data-max="5" on-rating-selected="rateFunction(rating)"></div>
             <table class="table">
                 <thead>
                     <tr>
@@ -27,10 +32,10 @@
         </div>
 
         <div class="row">
-            <form action="/submitcomments/<%= authorName %>/<%= paintingName %>/<%= paintingId %>/<%= description %>" method="post" enctype="multipart/form-data">
+            <form action="/submitcomments/<%= authorId %>/<%= authorName %>/<%= paintingName %>/<%= paintingId %>/<%= description %>" method="post" enctype="multipart/form-data">
 
                 <label>Say Something? </label>
-                <textarea rows="5" cols="100" placeholder="Enter Your Comments" name="comments"></textarea>
+                <textarea rows="5" cols="100" placeholder="Enter Your Comments" name="comments" required></textarea>
 
                 <footer>
                     <input type="submit" value="Submit" tabindex="1">
@@ -40,18 +45,80 @@
     </fieldset>
 </div>
 
+
+
 <script>
-    function classController($scope, $http) {
+    var app = angular.module('workdetail', []);
+    app.controller('classController', function ($scope, $http) {
         var openshiftUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/comments/<%= authorName %>/<%= paintingName %>/<%= paintingId %>";
         var loaclUrl = "http://localhost:8080/recentwork/comments/<%= authorName %>/<%= paintingName %>/<%= paintingId %>"
         $http.get(openshiftUrl).success(function (comments) {
             console.log(comments);
             $scope.comments = comments;
         });
-    }
+
+        $scope.rating = 5;
+        $scope.rateFunction = function (rating) {
+            alert('Rating selected - ' + rating);
+            var _url = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/rating/<%= authorName %>/<%= paintingName %>/<%= paintingId %>";
+
+            var data = {
+                rating: rating
+            };
+            $http.post(_url, angular.toJson(data), { cache: false })
+              .success(function (data) {
+                  
+                  console.log(data);
+              })
+              .error(function (data) {
+                 
+              });
+        };
+    });
+
+    app.directive('starRating',
+	function () {
+	    return {
+	        restrict: 'A',
+	        template: '<ul class="rating">'
+					 + '	<li ng-repeat="star in stars" ng-class="star" ng-click="toggle($index)">'
+					 + '\u2605'
+					 + '</li>'
+					 + '</ul>',
+	        scope: {
+	            ratingValue: '=',
+	            max: '=',
+	            onRatingSelected: '&'
+	        },
+	        link: function (scope, elem, attrs) {
+	            var updateStars = function () {
+	                scope.stars = [];
+	                for (var i = 0; i < scope.max; i++) {
+	                    scope.stars.push({
+	                        filled: i < scope.ratingValue
+	                    });
+	                }
+	            };
+
+	            scope.toggle = function (index) {
+	                scope.ratingValue = index + 1;
+	                scope.onRatingSelected({
+	                    rating: index + 1
+	                });
+	            };
+
+	            scope.$watch('ratingValue',
+					function (oldVal, newVal) {
+					    if (newVal) {
+					        updateStars();
+					    }
+					}
+				);
+	        }
+	    };
+	}
+    );
 </script>
-
-
 
 
 
