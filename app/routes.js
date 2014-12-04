@@ -32,15 +32,32 @@ module.exports = function (app, passport, server) {
                             rating: Number
                         }),
                'paintings');
+
     var comments = mongoose.model('Comments',
                new mongoose.Schema(
                         {
                             author: String,
+                            authorId: String,
                             paintingName: String,
                             paintingId: String,
                             comments: String
                         }),
                'comments');
+
+    var notifications = mongoose.model('Notifications',
+               new mongoose.Schema(
+                        {
+                            author: String,
+                            authorId: String,
+                            userName: String,
+                            userId: String,
+                            paintingName: String,
+                            newMsg: String,
+                            paintingId: String,
+                            paintingDesp: String
+
+                        }),
+               'notifications');
     var paintingName = undefined;
     app.use(bodyParser.json());
 	app.get('/', function(request, response) {
@@ -59,32 +76,59 @@ module.exports = function (app, passport, server) {
 	        name: paintingName
 	    });
 	});
-
+	
 	app.get('/image.png', function (req, res) {
     		res.sendfile(path.resolve('./uploads/image_'+req.user._id));
 	});
+	app.get('/headicon/:id/image.png', function (req, res) {
+	    res.sendfile(path.resolve('./uploads/image_'+req.params.id));
+	});
 
 	app.get('/:authorId/:authorName/profile', auth, function (req, res) {
-	    console.log("/:id/profile/author:" + req.params.id);
-	    res.render('friendpaintings.html', {
-	        user: req.user,
-	        authorId: req.params.authorId,
-	        authorName: req.params.authorName
-	    });
-	   
+	    var reqId = req.params.authorId;
+	    if (reqId == (req.user._id.toString())) {
+	        res.render('paintings.html', {
+	            user: req.user,
+	            name: paintingName
+	        });
+	    } else {
+	        res.render('friendpaintings.html', {
+	            user: req.user,
+	            authorId: req.params.authorId,
+	            authorName: req.params.authorName
+	        });
+	    }
 	});
 	app.get('/paintings/:authorId/:paintingName/image.png', function (req, res) {
 	    console.log("/paintings/:name/:id/image.png/author:" + req.params.paintingName);
 	    res.sendfile(path.resolve('./uploads/' + req.params.authorId + '/image_' + req.params.paintingName));
 
 	});
+	app.post('/notifications/:id', function (request, response) {
+	    console.log("newMsg:" + request.body.newMsg);
+	    response.json(request.body)
+	    notifications.findOne({ '_id': request.params.id }, function (err, notification) {
+	        if (err) { console.log("Error: could not find notification") }
+	        if (notification) {
+	            notification.newMsg = request.body.newMsg;
+	            notification.save(function (err) {
+	                if (!err) {
+	                    console.log("viewd successfully");              
+	                }
+	                else {
+	                    console.log("Error: could not view ");
+	                }
+	            });
+	        }
 
+	    });
+	});
 	app.post('/recentwork/rating/:authorName/:paintingName/:paintingId', function (request, response) {
 	    console.log("rating body:" + request.body.rating);
 	    response.json(request.body)
         paintings.findOne({ '_id': request.params.paintingId }, function (err, painting)
         {
-            if (err) { return done(err); }
+            if (err) { console.log("Error: could not find painting") }
             if (painting) {
                 painting.ratingSum = painting.ratingSum + request.body.rating;
                 painting.ratingCount = painting.ratingCount + 1;
@@ -119,7 +163,23 @@ module.exports = function (app, passport, server) {
                 }
             });
 	});
-
+	
+	app.get('/allpaintings', auth, function (request, response) {
+	   
+	    paintings.find(
+           
+            function (error, results) {
+                if (error) {
+                    response.json(error, 400);
+                } else if (!results) {
+                    response.send(404);
+                } else {
+                    console.log("all paintings:" + results);
+                    response.json(results);
+                }
+            });
+	});
+	
 	app.get('/recentwork/:id', auth, function (request, response) {
 	    console.log("recentwork:" + request.params.id);
 	    paintings.find(
@@ -135,6 +195,23 @@ module.exports = function (app, passport, server) {
                 }
             });
 	});
+
+	app.get('/notifications/:id', auth, function (request, response) {
+	    console.log("notifications");
+	    notifications.find(
+            { 'authorId': request.params.id },
+            function (error, results) {
+                if (error) {
+                    response.json(error, 400);
+                } else if (!results) {
+                    response.send(404);
+                } else {
+
+                    response.json(results);
+                }
+            });
+	});
+
 	app.get('/recentwork/:authorId/:authorName/:paintingName/:id/:description', auth, function (request, response) {
 	    response.render('workdetail.html', {
 	        user: request.user,
@@ -146,6 +223,12 @@ module.exports = function (app, passport, server) {
 	    });
 	});
 
+	app.get('/notification', auth, function (request, response) {
+	    response.render('notification.html', {
+	        user: request.user,
+	        authorId: request.user._id.toString()
+	    });
+	});
 	app.get('/paintingedit/:authorId/:authorName/:paintingName/:id/:description', auth, function (request, response) {
 	    response.render('paintingedit.html', {
 	        user: request.user,
@@ -272,11 +355,31 @@ module.exports = function (app, passport, server) {
 		app.post('/submitcomments/:authorId/:authorName/:paintingName/:paintingId/:description', function (req, res) {
 		    var newComments = {
 		        author: req.user.user.name,
+		        authorId: req.user._id,
 		        paintingName: req.param('paintingName'),
 		        paintingId: req.param('paintingId'),
 		        comments: req.param('comments'),
 		       
 		    };
+
+		    var newNotification = {
+		        author: req.param('authorName'),
+		        authorId:req.param('authorId'),
+		        userName: req.user.user.name,
+		        userId: req.user._id.toString(),
+		        paintingName: req.param('paintingName'),
+		        newMsg: 'new',
+		        paintingId: req.param('paintingId'),
+		        paintingDesp: req.param('description')
+
+		    };
+
+		    conn.collection('notifications').insert(newNotification, function (err, data) {
+
+		        console.log(data);
+		        
+		    });
+
 		    conn.collection('comments').insert(newComments, function (err, data) {
 		        
 		        console.log(data);

@@ -1,12 +1,32 @@
 <% include header.html %>
-<form class="box login">
-	<fieldset class="boxBody">
 
-		<label>Welcome to Gallery Demo.<br/>
-        In this demo, you can sign up/login/logout,view your profile and upload your paintings.
-		</label>
-		
-</fieldset>
-	
-</form>
+<div ng-app="paintingsWall" class="box profile">
+    <fieldset class="">
+        <div class="row" ng-controller="classController">
+            <br>
+            <br>
+            <div masonry column-width="50">
+                <div class="masonry-brick" ng-repeat="p in paintings">
+                    <img class="imgwall" ng-src="/paintings/{{p.authorId}}/{{p.paintingName}}/image.png" name="userimage" id="userimage" />
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</div>
+
+<script>
+    var app = angular.module('paintingsWall', ['wu.masonry']);
+
+    app.controller('classController', function ($scope, $http) {
+        var openshiftUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/allpaintings";
+        var loaclUrl = "http://localhost:8080/allpaintings"
+
+        $http.get(openshiftUrl).success(function (paintings) {
+            console.log(paintings);
+            $scope.paintings = paintings;
+        });
+    });
+</script>
+
+
 

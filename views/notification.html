@@ -1,0 +1,64 @@
+<% include header.html %>
+
+<div ng-app="notifications" class="box profile">
+    <fieldset class="">
+        <div class="row" ng-controller="classController">
+            <br>
+            <br>
+            <table class="table">
+                <tbody>
+                    <tr ng-repeat="n in notifications">
+
+                        <td>{{n.newMsg}}</td>
+                        <td><a href="http://gallerylogin-helloworldbasin.rhcloud.com/{{n.userId}}/{{n.userName}}/profile">{{n.userName}}</a> comments your painting: {{n.paintingName}}</td>
+                        <td>
+                            <button ng-click="view(n._id, n.authorId, n.author, n.paintingName, n.paintingId, n.paintingDesp)">View</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+</div>
+
+<script>
+    var app = angular.module('notifications', []);
+
+    app.controller('classController', function ($scope, $http) {
+        var openshiftUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/notifications/<%= authorId %>";
+        var loaclUrl = "http://localhost:8080/notifications/<%= authorId %>"
+
+        $http.get(openshiftUrl).success(function (notifications) {
+            console.log(notifications);
+            $scope.notifications = notifications;
+        });
+
+        $scope.view = function (nId, authorId, author, name, id, desp) {
+            console.log(name);
+            var data = {
+                newMsg: 'viewed'
+            };
+            var nURL = "http://gallerylogin-helloworldbasin.rhcloud.com/notifications/NID";
+            var nurl = nURL.replace('NID', nId);
+            $http.post(nurl, angular.toJson(data), { cache: false })
+              .success(function (data) {
+
+                  console.log(data);
+              })
+              .error(function (data) {
+
+              });
+            var URL = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/AID/AUTHOR/PNAME/PID/DESP";
+            var url = URL.replace("AID", authorId);
+            url = url.replace("AUTHOR", author);
+            url = url.replace("PNAME", name);
+            url = url.replace("PID", id);
+            url = url.replace("DESP", desp);
+            console.log(url);
+            location.href = url;
+        }
+
+    });
+</script>
+
+

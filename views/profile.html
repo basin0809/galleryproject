@@ -20,7 +20,7 @@
 
 <script>
    var socket = io.connect('http://gallerylogin-helloworldbasin.rhcloud.com');
-    //var socket = io.connect('http://localhost:8080');
+   // var socket = io.connect('http://gallerylogin-helloworldbasin.rhcloud.com');
   socket.on('connect', function(){
     socket.emit('adduser', "<%= user.user.name %>, <%= user.user.address %>");
   });

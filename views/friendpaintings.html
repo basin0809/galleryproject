@@ -3,11 +3,20 @@
     <div ng-app="paintings" class="box profile">
     <fieldset class="">
         <div class="row" ng-controller="classController">
+            <h2><b><%= authorName%>'s Info:</b></h2>
+            <div class="span12">
+                <img src="/headicon/<%= authorId %>/image.png" name="userimage" id="userimage" />
+                <label><strong>Name:</strong> <%= authorName %></label>
+                <label><strong>Gallery Id:</strong> <%= authorId %></label>
+                
+            </div>
             <br>
             <br>
+            <h2><b><%= authorName%>'s Work:</b></h2>
             <table class="table">
                 <thead>
                     <tr>
+                        <th></th>
                         <th>Author</th>
                         <th>Name</th>
                         <th>Description</th>
@@ -18,7 +27,7 @@
                 <tbody>
                     <tr ng-repeat="p in paintings">
                         <td>
-                            <button ng-click="comments(p.authorId, p.author, p.paintingName, p._id, p.description)">Comments</button>
+                            <button ng-click="comments(p.authorId, p.author, p.paintingName, p._id, p.description)">View</button>
                         </td>
                         <td>{{p.author}}</td>
                         <td><a href="http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/{{p.author}}/{{p.paintingName}}/{{p._id}}/{{p.description}}">{{p.paintingName}}</a></td>

@@ -357,3 +357,9 @@ span.stars>*{
     max-width:80px;
     background-position: 0 0;
 }
+
+.item { width: 25%; }
+.item.w2 { width: 50%; }
+.imgwall {
+    max-width:300px;
+}
