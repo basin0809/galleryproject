@@ -8,7 +8,7 @@
                 <li><span>Author: </span><%= authorName %></li>
                 <li><span>Painting:</span><%= paintingName %></li>
                 <li><%= description %></li>
-                <li><img src="/paintings/<%= authorId %>/<%= paintingName %>/image.png" id="userimage" /></li>
+                <li><img class="imgEdit" src="/paintings/<%= authorId %>/<%= paintingName %>/image.png" id="userimage" /></li>
             </ul>
         </div>
 
@@ -16,10 +16,10 @@
             <form action="/submitdescription/<%= authorName %>/<%= paintingName %>/<%= paintingId %>/<%= description %>" method="post" enctype="multipart/form-data">
 
                 <label>Edit Description: </label>
-                <textarea rows="5" cols="100" placeholder="<%= description %>" name="newdescription" required></textarea>
+                <textarea rows="5" cols="125" placeholder="<%= description %>" name="newdescription" required></textarea>
 
                 <footer>
-                    <input type="submit" value="Submit" tabindex="1">
+                    <input class="btnDetail" type="submit" value="Submit" tabindex="1">
                 </footer>
             </form>
         </div>

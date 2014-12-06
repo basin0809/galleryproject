@@ -13,7 +13,7 @@
                         <td><a href="http://gallerylogin-helloworldbasin.rhcloud.com/{{n.userId}}/{{n.userName}}/profile">{{n.userName}}</a> comments your painting: {{n.paintingName}}</td>
                         <td>{{n.updated}}</td>
                         <td>
-                            <button ng-click="view(n._id, n.authorId, n.author, n.paintingName, n.paintingId, n.paintingDesp)">View</button>
+                            <button class="btnView" ng-click="view(n._id, n.authorId, n.author, n.paintingName, n.paintingId, n.paintingDesp)">View</button>
                         </td>
                     </tr>
                 </tbody>

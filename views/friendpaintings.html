@@ -3,16 +3,18 @@
     <div ng-app="paintings" class="box profile">
     <fieldset class="">
         <div class="row" ng-controller="classController">
-            <h2><b><%= authorName%>'s Info:</b></h2>
+            <h2 class="friendInfo"><%= authorName%>'s Info:</h2>
             <div class="span12">
-                <img src="/headicon/<%= authorId %>/image.png" name="userimage" id="userimage" />
+                <img class="imgIcon" src="/headicon/<%= authorId %>/image.png" name="userimage" id="userimage" />
                 <label><strong>Name:</strong> <%= authorName %></label>
                 <label><strong>Gallery Id:</strong> <%= authorId %></label>
-                <button ng-click="follow()"><%= followStatus %></button>
+                <button class="btnFriend" ng-click="follow()"><%= followStatus %></button>
             </div>
             <br>
             <br>
-            <h2><b><%= authorName%>'s Work:</b></h2>
+            <br>
+            <br>
+            <h2 class="friendInfo"><%= authorName%>'s Work:</h2>
             <table class="table">
                 <thead>
                     <tr>
@@ -28,7 +30,7 @@
                 <tbody>
                     <tr ng-repeat="p in paintings">
                         <td>
-                            <button ng-click="comments(p.authorId, p.author, p.paintingName, p._id, p.description)">View</button>
+                            <button class="btnPtn" ng-click="comments(p.authorId, p.author, p.paintingName, p._id, p.description)">View</button>
                         </td>
                         <td>{{p.author}}</td>
                         <td><a href="http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/{{p.authorId}}/{{p.author}}/{{p.paintingName}}/{{p._id}}/{{p.description}}">{{p.paintingName}}</a></td>

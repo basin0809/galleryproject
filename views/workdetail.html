@@ -11,7 +11,7 @@
                 </li>
                 <li><span>Painting:</span><%= paintingName %></li>
                 <li><%= description %></li>
-                <li><img src="/paintings/<%= authorId %>/<%= paintingName %>/image.png" id="userimage" /></li>
+                <li><img class="imgDetail" src="/paintings/<%= authorId %>/<%= paintingName %>/image.png" id="userimage" /></li>
             </ul>
             <h3>Rating</h3>
             <div ng-init="rating = star.rating + 1"></div>
@@ -40,10 +40,10 @@
             <form action="/submitcomments/<%= authorId %>/<%= authorName %>/<%= paintingName %>/<%= paintingId %>/<%= description %>" method="post" enctype="multipart/form-data">
 
                 <label>Say Something? </label>
-                <textarea rows="5" cols="100" placeholder="Enter Your Comments" name="comments" required></textarea>
+                <textarea rows="5" cols="125" placeholder="Enter Your Comments" name="comments" required></textarea>
 
                 <footer>
-                    <input type="submit" value="Submit" tabindex="1">
+                    <input class="btnDetail" type="submit" value="Submit" tabindex="1">
                 </footer>
             </form>
         </div>

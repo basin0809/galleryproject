@@ -3,23 +3,35 @@
 <head>
 	<title>Gallery Login Form</title>
     <link rel="stylesheet" type="text/css" href="css/login.css">
-	<!--<link rel="stylesheet" type="text/css" href="css/reset.css">
-	<link rel="stylesheet" type="text/css" href="css/structure.css">-->
-
+	<link rel="stylesheet" type="text/css" href="css/reset.css">
+    <link rel="stylesheet"
+          href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css" />
 </head>
 <body>
-<form action="/login" method="post" class="box login">
-	<fieldset class="boxBody">
-	  <label>Email</label>
-	  <input type="text" tabindex="1" placeholder="Enter Your Email Address" name="email" required>
- 	  <label>Password</label>
-	  <input type="password" tabindex="2"  name="password" required>
-	</fieldset>
-	<footer>
-	<input TYPE="button" class="btnLogin" value="SignUp"  onClick="parent.location='/signup'">
-	  <input type="submit" class="btnLogin" value="Login" tabindex="4">
-	</footer>
+    <h1 class="title">Gallery</h1>
+    <h2 class="sideTitle"> Community for sharing and discovering new artwork.</h2>
+    <div id="content">
 
-</form>
+        <div class="topContent">
+            <fieldset class="">
+                <br>
+                <h1>Welcome to Gallery</h1>
+            </fieldset>
+        </div>
+       
+        <hr />
+        <form action="/login" method="post" class="box login">
+            <fieldset class="boxBody">
+                <label>Email</label>
+                <input type="text" tabindex="1" placeholder="Enter Your Email Address" name="email" required>
+                <label>Password</label>
+                <input type="password" tabindex="2" name="password" required>
+            </fieldset>
+            <footer>
+                <input type="button" class="btnLogin" value="SignUp" onclick="parent.location='/signup'">
+                <input type="submit" class="btnLogin" value="Login" tabindex="4">
+            </footer>
+        </form>
+    </div>
 </body>
 </html>

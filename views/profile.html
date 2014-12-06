@@ -27,7 +27,7 @@
 
   socket.on('updateusers', function(data) {
     $('#users').empty();
-var html = '<h2>Friend List</h2> <ul><% for(var i=0; i<friends.length; i++) { %><li>'
+var html = '<h2>You are following:</h2> <ul><% for(var i=0; i<friends.length; i++) { %><li>'
     $.each(data, function(key, value) {
         var str = "<%= friends[i] %>";
         console.log("friend:"+str);
@@ -96,7 +96,7 @@ $(function () {
 </script>
 </head>
 <body>
-<h1 class="title">Gallery Demo</h1>
+<h1 class="title">Gallery</h1>
 <div id="content">
 
 <div class="topContent">
@@ -158,7 +158,7 @@ $(function () {
 					<input type="text" id="search-query" placeholder="Please input your friend's name">
                     <input type="hidden" id="anotherfriendid" name="anotherfriendid">
                     <input type="hidden" id="mainfriendid" name="mainfriendid" value ="<%= user._id %>">
-                    <input type="submit" class="btnLogin" value="Add" tabindex="4">
+                    <input type="submit" class="btnProfile" value="Follow" tabindex="4">
 				</div>
 				<br>
 				<br>

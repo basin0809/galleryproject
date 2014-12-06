@@ -20,11 +20,11 @@
                 <tbody>
                     <tr ng-repeat="p in paintings">
                         <td>
-                            <button ng-click="comments(p.authorId, p.author, p.paintingName, p._id, p.description)">View</button>
+                            <button class="btnPtn" ng-click="comments(p.authorId, p.author, p.paintingName, p._id, p.description)">View</button>
                             <br/>
-                            <button ng-click="edit(p.authorId, p.author, p.paintingName, p._id, p.description)">Edit</button>
+                            <button class="btnPtn" ng-click="edit(p.authorId, p.author, p.paintingName, p._id, p.description)">Edit</button>
                             <br/>
-                            <button ng-click="delete(p.author, p.paintingName, p._id)" ng-confirm-click="Would you like to delete {{p.paintingName }}?">Delete</button>
+                            <button class="btnPtn" ng-click="delete(p.author, p.paintingName, p._id)" ng-confirm-click="Would you like to delete {{p.paintingName }}?">Delete</button>
                         </td>
                         <td>{{p.author}}</td>
                         <td>

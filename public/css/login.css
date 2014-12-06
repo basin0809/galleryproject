@@ -76,6 +76,7 @@ input{
 .box.login {
 	width: 380px;
 	margin: 10% auto 0;
+    margin-top:30px
 }
 
 .box footer label input {
@@ -157,7 +158,105 @@ input{
 .btnLogin:active {
 	text-shadow: rgba(0, 0, 0, 0.3) 0 -1px 0px;
 }
+.btnProfile{
+    width: auto;
+	
+	border: 1px solid #7db0cc !important;
+	cursor: pointer;
+	padding: 11px 16px;
+	font: bold 11px/14px Verdana, Tahomma, Geneva;
+	margin-left: 40px;
+	
+	padding: 7px 21px;
 
+}
+.btnProfile:hover,.btnProfile:focus,.btnProfile:active {
+	background: #333;
+}
+
+.btnProfile:active {
+	text-shadow: rgba(0, 0, 0, 0.3) 0 -1px 0px;
+}
+.btnUp{
+    width: auto;	
+	border: 1px solid #7db0cc !important;
+	cursor: pointer;	
+	font: bold 11px/14px Verdana, Tahomma, Geneva;
+	float: right;
+	padding: 7px 30px;
+}
+.btnUp:hover,.btnProfile:focus,.btnProfile:active {
+	background: #333;
+}
+
+.btnUp:active {
+	text-shadow: rgba(0, 0, 0, 0.3) 0 -1px 0px;
+}
+
+.btnPtn {
+    width: 90px;
+	border-radius: 15px;
+	border: 1px solid #7db0cc !important;
+	cursor: pointer;	
+	font: bold 11px/14px Verdana, Tahomma, Geneva;
+	float: left;
+	padding: 7px 17px;
+}
+.btnPtn:hover,.btnProfile:focus,.btnProfile:active {
+	background: #333;
+}
+
+.btnPtn:active {
+	text-shadow: rgba(0, 0, 0, 0.3) 0 -1px 0px;
+}
+
+.btnDetail {
+    width: 120px;
+	
+	border: 1px solid #7db0cc !important;
+	cursor: pointer;	
+	font: bold 11px/14px Verdana, Tahomma, Geneva;
+	float: right;
+	padding: 7px 17px;
+}
+.btnDetail:hover,.btnProfile:focus,.btnProfile:active {
+	background: #333;
+}
+
+.btnDetail:active {
+	text-shadow: rgba(0, 0, 0, 0.3) 0 -1px 0px;
+}
+.btnFriend{
+    width: 120px;
+	border-radius: 15px;
+	border: 1px solid #7db0cc !important;
+	cursor: pointer;	
+	font: bold 11px/14px Verdana, Tahomma, Geneva;
+    margin-top:10px;
+	padding: 7px 17px;
+}
+.btnFriend:hover,.btnProfile:focus,.btnProfile:active {
+	background: #333;
+}
+
+.btnFriend:active {
+	text-shadow: rgba(0, 0, 0, 0.3) 0 -1px 0px;
+}
+.btnView{
+    width: 90px;
+	border-radius: 15px;
+	border: 1px solid #7db0cc !important;
+	cursor: pointer;	
+	font: bold 11px/14px Verdana, Tahomma, Geneva;  
+	padding: 7px 17px;
+}
+.btnView:hover,.btnProfile:focus,.btnProfile:active {
+	background: #333;
+}
+
+.btnView:active {
+	text-shadow: rgba(0, 0, 0, 0.3) 0 -1px 0px;
+}
 .topContent {
 	height: 90px;
 	width: 152px;
@@ -344,8 +443,22 @@ div#menu li.back .left {
 .title {
     width: 780px;
 	margin: 30px auto;
+    margin-top:50px;
 	padding: 0px;
-    font-size: 30px;
+    font-size: 50px;
+}
+.sideTitle{
+    width: 580px;
+	margin: 60px auto;
+    margin-top:50px;
+	padding: 0px;
+    font-size: 15px;
+ }
+.friendInfo{
+    width: 780px;
+    margin-bottom:25px;
+	padding: 0px;
+    font-size: 25px;
 }
 span.stars, span.stars>* {
     display: inline-block;
@@ -365,4 +478,17 @@ span.stars>*{
 }
 .imgList {
     max-width:150px;
+}
+
+.imgDetail {
+    max-width:720px;
+}
+.imgEdit{
+    max-width:480px;
+}
+.imgIcon {
+    max-width:130px;
+    float:left;
+    margin:15px;
+    margin-top:0px
 }

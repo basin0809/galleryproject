@@ -63,8 +63,9 @@ module.exports = function (app, passport, server) {
                'notifications');
     var paintingName = undefined;
     app.use(bodyParser.json());
-	app.get('/', function(request, response) {
-		response.render('index.html');
+    app.get('/', function (request, response) {
+        response.redirect('/login');
+		//response.render('index.html');
 	});
 	app.get('/user', auth, function(request, response) {
 		notifications.count({ $and: [{ 'authorId': request.user._id }, { 'newMsg': 'new' }] },
@@ -163,7 +164,7 @@ module.exports = function (app, passport, server) {
                                 user: req.user,
                                 authorId: req.params.authorId,
                                 authorName: req.params.authorName,
-                                followStatus: 'Followed',
+                                followStatus: 'Following',
                                 newMsg: 0
                             });
                         } else if (!results) {                      
@@ -172,7 +173,7 @@ module.exports = function (app, passport, server) {
                                 user: req.user,
                                 authorId: req.params.authorId,
                                 authorName: req.params.authorName,
-                                followStatus: 'Followed',
+                                followStatus: 'Following',
                                 newMsg: 0
                             });
                         } else {                        
@@ -181,7 +182,7 @@ module.exports = function (app, passport, server) {
                                 user: req.user,
                                 authorId: req.params.authorId,
                                 authorName: req.params.authorName,
-                                followStatus: 'Followed',
+                                followStatus: 'Following',
                                 newMsg: 0,
                                 newMsg: results
                             });
@@ -567,7 +568,7 @@ module.exports = function (app, passport, server) {
 	});
 	app.get('/logout', function(request, response) {
 		request.logout();
-		response.redirect('/');
+		response.redirect('/login');
 	});
 
 		app.get('/login', function(request, response) {
