@@ -5,7 +5,10 @@
             <br>
             <br>
             <ul>
-                <li><span>Author: </span><%= authorName %></li>
+                <li>
+                <span>Author: </span>
+                    <a href="http://gallerylogin-helloworldbasin.rhcloud.com/<%= authorId %>/<%= authorName %>/profile"><%= authorName %></a>
+                </li>
                 <li><span>Painting:</span><%= paintingName %></li>
                 <li><%= description %></li>
                 <li><img src="/paintings/<%= authorId %>/<%= paintingName %>/image.png" id="userimage" /></li>
@@ -19,13 +22,15 @@
                 <thead>
                     <tr>
                         <th>Viwer</th>
-                        <th>Comments</th>                    
+                        <th>Comments</th> 
+                        <th>Date</th>                   
                     </tr>
                 </thead>
                 <tbody>
                     <tr ng-repeat="c in comments">
                         <td><a href="http://gallerylogin-helloworldbasin.rhcloud.com/{{c.authorId}}/{{c.author}}/profile">{{c.author}}</a></td>
-                        <td>{{c.comments}}</td>                 
+                        <td>{{c.comments}}</td> 
+                        <td>{{c.updated}}</td>                 
                     </tr>
                 </tbody>
             </table>
@@ -51,7 +56,7 @@
     var app = angular.module('workdetail', []);
     app.controller('classController', function ($scope, $http) {
         var openshiftUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/comments/<%= authorName %>/<%= paintingName %>/<%= paintingId %>";
-        var loaclUrl = "http://localhost:8080/recentwork/comments/<%= authorName %>/<%= paintingName %>/<%= paintingId %>"
+        var loaclUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/comments/<%= authorName %>/<%= paintingName %>/<%= paintingId %>"
         $http.get(openshiftUrl).success(function (comments) {
             console.log(comments);
             $scope.comments = comments;

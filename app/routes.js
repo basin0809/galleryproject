@@ -14,7 +14,7 @@ var openShiftConnection = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
     process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
     process.env.OPENSHIFT_APP_NAME;
 var bodyParser = require('body-parser');
-
+var moment = require('moment');
 mongoose.connect(openShiftConnection);
 module.exports = function (app, passport, server) {
     var Schema = mongoose.Schema,
@@ -29,7 +29,8 @@ module.exports = function (app, passport, server) {
                             description: String,
                             ratingSum: Number,
                             ratingCount: Number,
-                            rating: Number
+                            rating: Number,
+                            updated: String
                         }),
                'paintings');
 
@@ -40,7 +41,8 @@ module.exports = function (app, passport, server) {
                             authorId: String,
                             paintingName: String,
                             paintingId: String,
-                            comments: String
+                            comments: String,
+                            updated: String
                         }),
                'comments');
 
@@ -54,7 +56,8 @@ module.exports = function (app, passport, server) {
                             paintingName: String,
                             newMsg: String,
                             paintingId: String,
-                            paintingDesp: String
+                            paintingDesp: String,
+                            updated: String
 
                         }),
                'notifications');
@@ -64,17 +67,51 @@ module.exports = function (app, passport, server) {
 		response.render('index.html');
 	});
 	app.get('/user', auth, function(request, response) {
-		response.render('user.html', {
-			user : request.user
-		});
+		notifications.count({ $and: [{ 'authorId': request.user._id }, { 'newMsg': 'new' }] },
+            function (error, results) {
+                if (error) {
+                    response.render('user.html', {
+                        user: request.user,
+                        newMsg: 0
+                    });
+                } else if (!results) {
+                    response.render('user.html', {
+                        user: request.user,
+                        newMsg: 0
+                    });
+                } else {
+                    response.render('user.html', {
+                        user: request.user,
+                        newMsg: results
+                    });
+                }
+            });
 	});
 
 	app.get('/paintings', auth, function (request, response) {
-	    console.log("/paintings/name:" + paintingName);
-	    response.render('paintings.html', {
-	        user : request.user,
-	        name: paintingName
-	    });
+	    console.log("/paintings/name:" + paintingName);    
+	    notifications.count({ $and: [{ 'authorId': request.user._id }, { 'newMsg': 'new' }] },
+            function (error, results) {
+                if (error) {
+                    response.render('paintings.html', {
+                        user: request.user,
+                        name: paintingName,
+                        newMsg: 0
+                    });
+                } else if (!results) {
+                    response.render('paintings.html', {
+                        user: request.user,
+                        name: paintingName,
+                        newMsg: 0
+                    });
+                } else {
+                    response.render('paintings.html', {
+                        user: request.user,
+                        name: paintingName,
+                        newMsg: results
+                    });
+                }
+            });
 	});
 	
 	app.get('/image.png', function (req, res) {
@@ -86,17 +123,109 @@ module.exports = function (app, passport, server) {
 
 	app.get('/:authorId/:authorName/profile', auth, function (req, res) {
 	    var reqId = req.params.authorId;
+	    var followStatus;
+	  
 	    if (reqId == (req.user._id.toString())) {
-	        res.render('paintings.html', {
-	            user: req.user,
-	            name: paintingName
-	        });
+	        notifications.count({ $and: [{ 'authorId': req.user._id }, { 'newMsg': 'new' }] },
+            function (error, results) {
+                if (error) {
+                    res.render('paintings.html', {
+                        user: req.user,
+                        name: paintingName,
+                        newMsg: 0
+                    });
+                } else if (!results) {
+                    res.render('paintings.html', {
+                        user: req.user,
+                        name: paintingName,
+                        newMsg: 0
+                    });
+                } else {
+                    res.render('paintings.html', {
+                        user: req.user,
+                        name: paintingName,
+                        newMsg: results
+                    });
+                }
+            });
+	       
 	    } else {
-	        res.render('friendpaintings.html', {
-	            user: req.user,
-	            authorId: req.params.authorId,
-	            authorName: req.params.authorName
+	        Friend.findOne({
+	            $and: [{ 'friend.mainfriendid': req.user._id.toString() },
+                    { 'friend.anotherfriendid': req.param('authorId') }]
+	        }, function (err, friend) {
+	            if (err) { return done(err); }
+	            if (friend) {
+	                notifications.count({ $and: [{ 'authorId': req.user._id }, { 'newMsg': 'new' }] },
+                    function (error, results) {
+                        if (error) {
+                            res.render('friendpaintings.html', {
+                                user: req.user,
+                                authorId: req.params.authorId,
+                                authorName: req.params.authorName,
+                                followStatus: 'Followed',
+                                newMsg: 0
+                            });
+                        } else if (!results) {                      
+                            console.log("followStatus: followed");
+                            res.render('friendpaintings.html', {
+                                user: req.user,
+                                authorId: req.params.authorId,
+                                authorName: req.params.authorName,
+                                followStatus: 'Followed',
+                                newMsg: 0
+                            });
+                        } else {                        
+                            console.log("followStatus: followed");
+                            res.render('friendpaintings.html', {
+                                user: req.user,
+                                authorId: req.params.authorId,
+                                authorName: req.params.authorName,
+                                followStatus: 'Followed',
+                                newMsg: 0,
+                                newMsg: results
+                            });
+                        }
+                    });
+	                
+	            } else {
+	                notifications.count({ $and: [{ 'authorId': req.user._id }, { 'newMsg': 'new' }] },
+                    function (error, results) {
+                        if (error) {
+                            res.render('friendpaintings.html', {
+                                user: req.user,
+                                authorId: req.params.authorId,
+                                authorName: req.params.authorName,
+                                followStatus: 'Follow',
+                                newMsg: 0
+                            });
+                        } else if (!results) {
+                            console.log("followStatus: followed");
+                            console.log("followStatus: follow");
+                            res.render('friendpaintings.html', {
+                                user: req.user,
+                                authorId: req.params.authorId,
+                                authorName: req.params.authorName,
+                                followStatus: 'Follow',
+                                newMsg: 0
+                            });
+                        } else {
+                            console.log("followStatus: followed");
+                            res.render('friendpaintings.html', {
+                                user: req.user,
+                                authorId: req.params.authorId,
+                                authorName: req.params.authorName,
+                                followStatus: 'Follow',
+                                newMsg: 0,
+                                newMsg: results
+                            });
+                        }
+                    });
+	               
+	            }
+	            
 	        });
+	       
 	    }
 	});
 	app.get('/paintings/:authorId/:paintingName/image.png', function (req, res) {
@@ -151,7 +280,7 @@ module.exports = function (app, passport, server) {
 	app.get('/recentwork/comments/:authorName/:paintingName/:paintingId', auth, function (request, response) {
 	    console.log("comments:" + request.params.paintingName);
 	    comments.find(
-            { 'paintingId': request.params.paintingId },
+            { 'paintingId': request.params.paintingId }, null, { sort: { updated: 1 } },
             function (error, results) {
                 if (error) {
                     response.json(error, 400);
@@ -166,7 +295,7 @@ module.exports = function (app, passport, server) {
 	
 	app.get('/allpaintings', auth, function (request, response) {
 	   
-	    paintings.find(
+	    paintings.find({}, null, { sort: { updated: 1 } },
            
             function (error, results) {
                 if (error) {
@@ -183,7 +312,7 @@ module.exports = function (app, passport, server) {
 	app.get('/recentwork/:id', auth, function (request, response) {
 	    console.log("recentwork:" + request.params.id);
 	    paintings.find(
-            { 'authorId': request.params.id },
+            { 'authorId': request.params.id }, null, { sort: { updated: 1 } },
             function (error, results) {
                 if (error) {
                     response.json(error, 400);
@@ -199,12 +328,12 @@ module.exports = function (app, passport, server) {
 	app.get('/notifications/:id', auth, function (request, response) {
 	    console.log("notifications");
 	    notifications.find(
-            { 'authorId': request.params.id },
+            { 'authorId': request.params.id }, null, { sort: { updated: 1 } },
             function (error, results) {
                 if (error) {
                     response.json(error, 400);
                 } else if (!results) {
-                    response.send(404);
+                    response.json("0");
                 } else {
 
                     response.json(results);
@@ -212,53 +341,196 @@ module.exports = function (app, passport, server) {
             });
 	});
 
-	app.get('/recentwork/:authorId/:authorName/:paintingName/:id/:description', auth, function (request, response) {
-	    response.render('workdetail.html', {
-	        user: request.user,
-	        authorId: request.params.authorId,
-	        authorName: request.params.authorName,
-	        paintingName: request.params.paintingName,
-	        paintingId: request.params.id,
-	        description: request.params.description
-	    });
+	app.get('/notifications/count', auth, function (request, response) {    
+	    notifications.count({ $and: [{ 'authorId': request.user._id }, { 'newMsg': 'new' }] }
+            ,
+            function (error, results) {
+                if (error) {
+                    response.json(error, 400);
+                } else if (!results) {
+                    response.send(404);
+                } else {
+                    console.log(results+" new notifications");
+                    response.json(results);
+                }
+            });
+	});
+
+	app.get('/recentwork/:authorId/:authorName/:paintingName/:id/:description', auth, function (request, response) {	   
+	    notifications.count({ $and: [{ 'authorId': request.user._id }, { 'newMsg': 'new' }] },
+            function (error, results) {
+                if (error) {
+                    response.render('workdetail.html', {
+                        user: request.user,
+                        authorId: request.params.authorId,
+                        authorName: request.params.authorName,
+                        paintingName: request.params.paintingName,
+                        paintingId: request.params.id,
+                        description: request.params.description,
+                        newMsg: 0
+                    });
+                } else if (!results) {
+                    response.render('workdetail.html', {
+                        user: request.user,
+                        authorId: request.params.authorId,
+                        authorName: request.params.authorName,
+                        paintingName: request.params.paintingName,
+                        paintingId: request.params.id,
+                        description: request.params.description,
+                        newMsg: 0
+                    });
+                } else {
+                    response.render('workdetail.html', {
+                        user: request.user,
+                        authorId: request.params.authorId,
+                        authorName: request.params.authorName,
+                        paintingName: request.params.paintingName,
+                        paintingId: request.params.id,
+                        description: request.params.description,
+                        newMsg: results
+                    });
+                }
+            });
 	});
 
 	app.get('/notification', auth, function (request, response) {
-	    response.render('notification.html', {
-	        user: request.user,
-	        authorId: request.user._id.toString()
-	    });
+	    
+	    notifications.count({ $and: [{ 'authorId': request.user._id }, { 'newMsg': 'new' }] }
+            ,
+            function (error, results) {
+                if (error) {
+                    response.render('notification.html', {
+                        user: request.user,
+                        authorId: request.user._id.toString(),
+                        newMsg: 0
+                    });
+                } else if (!results) {
+                   response.render('notification.html', {
+                        user: request.user,
+                        authorId: request.user._id.toString(),
+                        newMsg: 0
+                    });
+                } else {
+                   response.render('notification.html', {
+                        user: request.user,
+                        authorId: request.user._id.toString(),
+                        newMsg: results
+                    });
+                }
+            });
 	});
 	app.get('/paintingedit/:authorId/:authorName/:paintingName/:id/:description', auth, function (request, response) {
-	    response.render('paintingedit.html', {
-	        user: request.user,
-	        authorId: request.params.authorId,
-	        authorName: request.params.authorName,
-	        paintingName: request.params.paintingName,
-	        paintingId: request.params.id,
-	        description: request.params.description
-	    });
+	    
+	    notifications.count({ $and: [{ 'authorId': request.user._id }, { 'newMsg': 'new' }] }
+            ,
+            function (error, results) {
+                if (error) {
+                    response.render('paintingedit.html', {
+                        user: request.user,
+                        authorId: request.params.authorId,
+                        authorName: request.params.authorName,
+                        paintingName: request.params.paintingName,
+                        paintingId: request.params.id,
+                        description: request.params.description,
+                        newMsg: 0
+                    });
+                } else if (!results) {
+                    response.render('paintingedit.html', {
+                        user: request.user,
+                        authorId: request.params.authorId,
+                        authorName: request.params.authorName,
+                        paintingName: request.params.paintingName,
+                        paintingId: request.params.id,
+                        description: request.params.description,
+                        newMsg: 0
+                    });
+                } else {
+                    response.render('paintingedit.html', {
+                        user: request.user,
+                        authorId: request.params.authorId,
+                        authorName: request.params.authorName,
+                        paintingName: request.params.paintingName,
+                        paintingId: request.params.id,
+                        description: request.params.description,
+                        newMsg: results
+                    });
+                }
+            });
 	});
 
 	app.get('/edit', auth, function(request, response) {
-		response.render('edit.html', {
-			user : request.user
-		});
+
+		notifications.count({ $and: [{ 'authorId': request.user._id }, { 'newMsg': 'new' }] }
+            ,
+            function (error, results) {
+                if (error) {
+                    response.render('edit.html', {
+                        user: request.user,
+                        newMsg: 0
+                    });
+                } else if (!results) {
+                    response.render('edit.html', {
+                        user: request.user,
+                        newMsg: 0
+                    });
+                } else {
+                    response.render('edit.html', {
+                        user: request.user,
+                        newMsg: results
+                    });
+                }
+            });
 	});
 	app.get('/upload', auth, function (request, response) {
-	    response.render('upload.html', {
-	        user: request.user
-	    });
+	   notifications.count({ $and: [{ 'authorId': request.user._id }, { 'newMsg': 'new' }] },
+            function (error, results) {
+                if (error) {
+                    response.render('upload.html', {
+                        user: request.user,
+                        newMsg: 0
+                    });
+                } else if (!results) {
+                    response.render('upload.html', {
+                        user: request.user,
+                        newMsg: 0
+                    });
+
+                } else {
+                    response.render('upload.html', {
+                        user: request.user,
+                        newMsg: results
+                    });
+
+                }
+            });
 	});
 	app.get('/paintings', auth, function (request, response) {
-	    response.render('paintings.html', {
-	        user: request.user
-	    });
+	    notifications.count({ $and: [{ 'authorId': request.user._id }, { 'newMsg': 'new' }] },
+            function (error, results) {
+                if (error) {
+                    response.render('paintings.html', {
+                        user: request.user,
+                        newMsg: 0
+                    });
+                } else if (!results) {
+                    response.render('paintings.html', {
+                        user: request.user,
+                        newMsg: 0
+                    });
+                   
+                } else {
+                    response.render('paintings.html', {
+                        user: request.user,
+                        newMsg: results
+                    });
+                   
+                }
+            });
 	});
 	app.get('/recentwork', auth, function (request, response) {
 	    console.log("find recentwork:" + request.user._id);
 	    paintings.find(
-            { 'authorId': request.user._id.toString()},
+            { 'authorId': request.user._id.toString() }, null, { sort: { updated: 1 } },
             function (error, results) {
 	        if (error) {
 	            response.json(error, 400);
@@ -270,11 +542,28 @@ module.exports = function (app, passport, server) {
 	        }
 	    });
 	});
-	app.get('/about', auth, function(request, response) {
-		response.render('about.html', {
-		    user: request.user
-
-		});
+	app.get('/about', auth, function (request, response) {
+	    notifications.count({ $and: [{ 'authorId': request.user._id }, { 'newMsg': 'new' }] }
+            ,
+            function (error, results) {
+                if (error) {
+                    response.render('about.html', {
+                        user: request.user,
+                        newMsg: 0
+                    });
+                } else if (!results) {
+                    response.render('about.html', {
+                        user: request.user,
+                        newMsg: 0
+                    });
+                } else {
+                    response.render('about.html', {
+                        user: request.user,
+                        newMsg: results
+                    });
+                }
+            });
+		
 	});
 	app.get('/logout', function(request, response) {
 		request.logout();
@@ -339,6 +628,7 @@ module.exports = function (app, passport, server) {
 		        if (err) { return done(err); }
 		        if (painting) {
 		            painting.description = request.param('newdescription');
+		            painting.updated = moment().format('MMMM Do YYYY');
 		            painting.save(function (err) {
 		                if (!err) {
 		                    console.log("edit successfully");
@@ -353,13 +643,14 @@ module.exports = function (app, passport, server) {
 		    });		   
 		});
 		app.post('/submitcomments/:authorId/:authorName/:paintingName/:paintingId/:description', function (req, res) {
+		    var date = moment().format('MMMM Do YYYY');
 		    var newComments = {
 		        author: req.user.user.name,
 		        authorId: req.user._id,
 		        paintingName: req.param('paintingName'),
 		        paintingId: req.param('paintingId'),
 		        comments: req.param('comments'),
-		       
+                updated: date		       
 		    };
 
 		    var newNotification = {
@@ -370,8 +661,8 @@ module.exports = function (app, passport, server) {
 		        paintingName: req.param('paintingName'),
 		        newMsg: 'new',
 		        paintingId: req.param('paintingId'),
-		        paintingDesp: req.param('description')
-
+		        paintingDesp: req.param('description'),
+		        updated: date
 		    };
 
 		    conn.collection('notifications').insert(newNotification, function (err, data) {
@@ -447,8 +738,8 @@ module.exports = function (app, passport, server) {
 		                throw err;
 		            })
 		        });
-		    }
-		   
+		    }		   
+		    var date = moment().format('MMMM Do YYYY');
 		    var newPainting = {
 		        authorId: req.user._id.toString(),
 		        author: req.param('author'),               
@@ -456,7 +747,8 @@ module.exports = function (app, passport, server) {
 		        description: req.param('description'),
 		        ratingSum: 0,
 		        ratingCount: 0,
-                rating:0
+		        rating: 0,
+		        updated: date
 		       
 		    };
 		    conn.collection('paintings').insert(newPainting, function (err, data) {
@@ -540,12 +832,32 @@ module.exports = function (app, passport, server) {
 					});
    				}
   			},
-  			function(err){
-         			response.render('profile.html', {
-					user : request.user,
-					friends: frdDetails,
-         			friendsId: frdIds
-				});
+  			function (err) {
+                notifications.count({ $and: [{ 'authorId': request.user._id }, { 'newMsg': 'new' }] },
+                function (error, results) {
+                    if (error) {
+                        response.render('profile.html', {
+                            user: request.user,
+                            friends: frdDetails,
+                            friendsId: frdIds,
+                            newMsg: 0
+                        });
+                    } else if (!results) {
+                        response.render('profile.html', {
+                            user: request.user,
+                            friends: frdDetails,
+                            friendsId: frdIds,
+                            newMsg: 0
+                        });
+                    } else {
+                        response.render('profile.html', {
+                            user: request.user,
+                            friends: frdDetails,
+                            friendsId: frdIds,
+                            newMsg: results
+                        });
+                    }
+                });
   			}
 		);
        		} else {
@@ -578,7 +890,8 @@ module.exports = function (app, passport, server) {
    		});
 	});
 
-		app.post('/friend',  function (request, response){
+	app.post('/friend', function (request, response) {
+	    console.log('friend.anotherfriendid: ' + request.param('anotherfriendid'));
 				Friend.findOne({ $and: [ {'friend.mainfriendid': request.param('mainfriendid')}, { 'friend.anotherfriendid': request.param('anotherfriendid') } ] }, function(err, friend) {
             	    		if (err){ return done(err);}
                     		if (friend) {
@@ -596,7 +909,26 @@ module.exports = function (app, passport, server) {
  				});
   		});
 
-
+	
+	app.post('/friend/follow/:id/:name', auth, function (request, response) {
+	    Friend.findOne({
+	        $and: [{ 'friend.mainfriendid': request.user._id.toString() },
+                { 'friend.anotherfriendid': request.params.id }]
+	    }, function (err, friend) {
+                if (err){ return done(err);}
+                if (friend) {
+                    response.json("already followed");
+                } else {
+                    if(request.params.id != ''){
+                        var newFriend            = new Friend();
+                        newFriend.friend.mainfriendid = request.user._id.toString();
+                        newFriend.friend.anotherfriendid = request.params.id;
+                        newFriend.save();
+                    }
+                    response.redirect('/' + request.params.id + '/' + request.params.name + '/profile');
+                }
+            });
+        });
 
 // GET /auth/facebook
 // Use passport.authenticate() as route middleware to authenticate the

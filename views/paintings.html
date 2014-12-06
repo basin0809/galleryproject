@@ -14,6 +14,7 @@
                         <th>Description</th>
                         <th>Painting</th>
                         <th>Rating</th>
+                        <th>Date</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -33,13 +34,15 @@
                         </td>
                         <td>{{p.description}}</td>
                         <td>
-                            <img src=/paintings/{{p.authorId}}/{{p.paintingName}}/image.png name="userimage" id="userimage" />
+                            <img class="imgList" src=/paintings/{{p.authorId}}/{{p.paintingName}}/image.png name="userimage" id="userimage" />
 
                         </td>
                         <td class="ng-binding">
                             <span>{{p.rating}} of 5 stars</span>
                         </td>
-                       
+                        <td >
+                            <span>{{p.updated}}</span>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -52,7 +55,7 @@
 
     app.controller('classController', function ($scope, $http) {
         var openshiftUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork";
-        var loaclUrl = "http://localhost:8080/recentwork"
+        var loaclUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork"
         $http.get(openshiftUrl).success(function (paintings) {
             console.log(paintings);
             $scope.paintings = paintings;

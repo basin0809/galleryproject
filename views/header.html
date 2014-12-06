@@ -22,55 +22,71 @@
  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
   <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
     <script type="text/javascript" src="http://gallerylogin-helloworldbasin.rhcloud.com/js/angular.min.js"></script>
+    <script type="text/javascript" src="http://gallerylogin-helloworldbasin.rhcloud.com/bower_components/angular-route/angular-route.js"></script>
+   
     <script type="text/javascript" src="http://gallerylogin-helloworldbasin.rhcloud.com/js/masonry.pkgd.min.js"></script>
     <script type="text/javascript" src="http://gallerylogin-helloworldbasin.rhcloud.com/bower_components/imagesloaded/imagesloaded.js"></script>
     <script type="text/javascript" src="http://gallerylogin-helloworldbasin.rhcloud.com/bower_components/angular-masonry/angular-masonry.js"></script>
-    
+    <script type="text/javascript" src="http://gallerylogin-helloworldbasin.rhcloud.com/bower_components/moment/moment.js"></script>
+
+
 </head>
 <body>
 <h1 class="title">Gallery Demo</h1>
-<div id="content">
+    <div id="content">
 
-	<div class="topContent">
-          <fieldset class="">
-		<br>
-            <h1>Welcome  <%= user.user.username %></h1>
-          </fieldset>
+        <div class="topContent">
+            <fieldset class="">
+                <br>
+                <h1>Welcome  <%= user.user.username %></h1>
+            </fieldset>
         </div>
-        <div id="menu">
-          <fieldset class="">
-            <ul class="menu">
-              <li>
-                    <a href="/about">
-                        <h1>Home</h1>
-                    </a>
-                </li>   
-              <li><a href="/user">
-                           <h1>Profile</h1>
-                         </a></li>           
-              <li><a href="/profile">
-                           <h1>Friends</h1>
-                         </a></li>
-              <li><a href="/upload">
-                            <h1>Upload Paintings</h1>
-                         </a></li>
-              <li>
-                  <a href="/paintings">
-                      <h1>Recent Works</h1>
-                  </a>
-              </li>
-              <li>
-                    <a href="/notification">
-                        <h1>Notification</h1>
-                    </a>
-              </li>
-              <li><a href="/logout">
-                           <h1>Log Out</h1>
-                         </a></li>
-            </ul>
-          </fieldset>
+        <div id="menu" >
+            
+                <fieldset class="">
+                    <ul class="menu">
+                        <li>
+                            <a href="/about">
+                                <h1>Home</h1>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/user">
+                                <h1>Profile</h1>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/profile">
+                                <h1>Friends</h1>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/upload">
+                                <h1>Upload Paintings</h1>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/paintings">
+                                <h1>Recent Works</h1>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/notification">
+                                <h1>Notification(<%= newMsg %> new)</h1>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/logout">
+                                <h1>Log Out</h1>
+                            </a>
+                        </li>
+                    </ul>
+                </fieldset>
+            
         </div>
-    <hr/>
-</div>
+        <hr />
+    </div>
 </body>
+
+
 </html>

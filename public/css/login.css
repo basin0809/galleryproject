@@ -361,5 +361,8 @@ span.stars>*{
 .item { width: 25%; }
 .item.w2 { width: 50%; }
 .imgwall {
-    max-width:300px;
+    max-width:200px;
+}
+.imgList {
+    max-width:150px;
 }

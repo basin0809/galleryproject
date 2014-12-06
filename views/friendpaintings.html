@@ -8,7 +8,7 @@
                 <img src="/headicon/<%= authorId %>/image.png" name="userimage" id="userimage" />
                 <label><strong>Name:</strong> <%= authorName %></label>
                 <label><strong>Gallery Id:</strong> <%= authorId %></label>
-                
+                <button ng-click="follow()"><%= followStatus %></button>
             </div>
             <br>
             <br>
@@ -22,6 +22,7 @@
                         <th>Description</th>
                         <th>Painting</th>
                         <th>Rating</th>
+                        <th>Date</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,14 +31,17 @@
                             <button ng-click="comments(p.authorId, p.author, p.paintingName, p._id, p.description)">View</button>
                         </td>
                         <td>{{p.author}}</td>
-                        <td><a href="http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/{{p.author}}/{{p.paintingName}}/{{p._id}}/{{p.description}}">{{p.paintingName}}</a></td>
+                        <td><a href="http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/{{p.authorId}}/{{p.author}}/{{p.paintingName}}/{{p._id}}/{{p.description}}">{{p.paintingName}}</a></td>
                         <td>{{p.description}}</td>
                         <td>
-                            <img src="/paintings/<%= authorId %>/{{p.paintingName}}/image.png" name="userimage" id="userimage" />
+                            <img class="imgList" src="/paintings/<%= authorId %>/{{p.paintingName}}/image.png" name="userimage" id="userimage" />
 
                         </td>
                         <td class="ng-binding">
                             <span>{{p.rating}} of 5 stars</span>
+                        </td>
+                        <td>
+                            <span>{{p.updated}}</span>
                         </td>
                     </tr>
                 </tbody>
@@ -47,11 +51,11 @@
 </div>
 
 <script>
-    var app = angular.module('paintings', []);
+    var app = angular.module('paintings', ['ngRoute']);
 
-    app.controller('classController', function ($scope, $http) {
+    app.controller('classController', function ($scope, $http, $window) {
         var openshiftUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/<%= authorId %>";
-        var loaclUrl = "http://localhost:8080/recentwork/<%= authorId %>"
+        var loaclUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/recentwork/<%= authorId %>"
 
         $http.get(openshiftUrl).success(function (paintings) {
             console.log(paintings);
@@ -70,6 +74,12 @@
             location.href = url;
         }
 
+        $scope.follow = function(){
+            $http.post("http://gallerylogin-helloworldbasin.rhcloud.com/friend/follow/<%= authorId %>/<%= authorName %>").success(function (friend) {
+                console.log(friend);
+                $window.location.reload();
+            });
+        }
     });
 </script>
 

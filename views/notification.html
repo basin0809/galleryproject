@@ -11,6 +11,7 @@
 
                         <td>{{n.newMsg}}</td>
                         <td><a href="http://gallerylogin-helloworldbasin.rhcloud.com/{{n.userId}}/{{n.userName}}/profile">{{n.userName}}</a> comments your painting: {{n.paintingName}}</td>
+                        <td>{{n.updated}}</td>
                         <td>
                             <button ng-click="view(n._id, n.authorId, n.author, n.paintingName, n.paintingId, n.paintingDesp)">View</button>
                         </td>
@@ -26,7 +27,7 @@
 
     app.controller('classController', function ($scope, $http) {
         var openshiftUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/notifications/<%= authorId %>";
-        var loaclUrl = "http://localhost:8080/notifications/<%= authorId %>"
+        var loaclUrl = "http://gallerylogin-helloworldbasin.rhcloud.com/notifications/<%= authorId %>"
 
         $http.get(openshiftUrl).success(function (notifications) {
             console.log(notifications);
