@@ -296,7 +296,7 @@ module.exports = function (app, passport, server) {
 	
 	app.get('/allpaintings', auth, function (request, response) {
 	   
-	    paintings.find({}, null, { sort: { updated: 1 } },
+	    paintings.find({ 'rating': { $gt: 2 } }, null, { sort: { updated: 1 } },
            
             function (error, results) {
                 if (error) {
