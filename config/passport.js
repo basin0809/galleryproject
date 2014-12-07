@@ -72,11 +72,11 @@ module.exports = function(passport) {
                         return done(null, false, req.flash('signuperror', 'User already exists'));
                     } else {
                         var newUser            = new User();
-			newUser.user.username    = req.body.username;
+			            newUser.user.username    = req.body.username;
                         newUser.user.email    = email;
                         newUser.user.password = newUser.generateHash(password);
-			newUser.user.name	= ''
-			newUser.user.address	= ''
+                        newUser.user.name = req.body.username;
+			            newUser.user.address	= ''
                         newUser.save(function(err) {
                             if (err)
                                 throw err;
@@ -90,7 +90,7 @@ module.exports = function(passport) {
 		user.user.username    = req.body.username;
                 user.user.email    = email;
                 user.user.password = user.generateHash(password);
-			user.user.name	= ''
+                user.user.name = req.body.username;
 			user.user.address	= ''
 
                 user.save(function(err) {

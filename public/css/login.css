@@ -492,3 +492,7 @@ span.stars>*{
     margin:15px;
     margin-top:0px
 }
+.noteInfo{
+    color:red;
+    font-size:17px
+}
